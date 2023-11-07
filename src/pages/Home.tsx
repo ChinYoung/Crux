@@ -1,76 +1,101 @@
-import React, { FC, createRef, useCallback, useContext, useEffect, useState } from 'react';
-import { Button, StyleSheet, Text, TextInput, TextInputChangeEventData, View } from 'react-native';
-import { ETag } from '../entities';
+import React, { FC, useCallback, useContext, useEffect, useState } from 'react';
+import { Pressable, SafeAreaView, StyleSheet, View } from 'react-native';
 import { globalContext } from '../context/globalContext';
 import { Capsule } from '../components/Capsule';
-import { NativeEvent } from 'react-native-reanimated/lib/typescript/reanimated2/commonTypes';
+import AddIcon from '../images/Add.svg';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { RootStackParamList } from '../types/Router';
+import { ETag } from '../entities/ETag';
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    width: '100%',
-    backgroundColor: '#fff',
+  debug: {
+    borderColor: 'blue',
+    borderStyle: 'solid',
+    borderWidth: 1,
   },
-  listContainer: {
+  root: {
+    display: 'flex',
+    position: 'relative',
+    width: '100%',
+    height: '100%',
+    padding: 8,
+    justifyContent: 'space-between',
+  },
+  container: {
+    width: '100%',
+    display: 'flex',
+    paddingVertical: 8,
+    flex: 1,
+    flexWrap: 'wrap',
+    justifyContent: 'flex-start',
+    alignItems: 'center',
+  },
+  contentWrapper: {
     width: '100%',
     display: 'flex',
     flexWrap: 'wrap',
     flexDirection: 'row',
-    paddingVertical: 2,
-    paddingHorizontal: 4,
-    gap: 4,
+    justifyContent: 'flex-start',
+    alignItems: 'center',
+    gap: 8,
   },
-  formContainer: {},
-  inputs: {
-    borderWidth: 1,
-    borderStyle: 'solid',
-    borderColor: 'blue',
+  footer: {
+    width: '100%',
+    left: 0,
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingBottom: 10,
   },
 });
 
-export const Home: FC = () => {
+export const Home: FC<NativeStackScreenProps<RootStackParamList, 'Home'>> = ({ navigation }) => {
   const [allTag, setAllTag] = useState<ETag[]>([]);
   const { dbConn } = useContext(globalContext);
-  const getAllTag = useCallback(async () => {
-    const res = await dbConn?.manager.find(ETag);
-    return res || [];
+  const refresh = useCallback(async () => {
+    const res = await dbConn?.manager.find(ETag, {
+      relations: {
+        items: true,
+      },
+    });
+    res && setAllTag(res);
   }, [dbConn?.manager]);
 
-  const inputRef = createRef<TextInput>();
+  const toAddPage = useCallback(() => {
+    navigation.navigate('AddTag');
+  }, [navigation]);
 
-  const [newName, setNewName] = useState<string>('');
-  const updateName = useCallback((_e: NativeEvent<TextInputChangeEventData>) => {
-    setNewName(_e.nativeEvent.text);
-  }, []);
-  const addTag = useCallback(() => {
-    const newTag = dbConn?.manager.create(ETag, {
-      name: newName,
-    });
-    dbConn?.manager.save(newTag).then(() => {
-      getAllTag().then((res) => setAllTag(res));
-    });
-    inputRef.current?.clear();
-  }, [dbConn?.manager, getAllTag, inputRef, newName]);
+  const toTagDetail = useCallback(
+    (id: string) => {
+      // TODO: implement this
+      navigation.navigate('TagDetail', { id });
+    },
+    [navigation],
+  );
 
   useEffect(() => {
-    getAllTag().then((res) => {
-      console.log('🚀 ~ file: Home.tsx:65 ~ getAllTag ~ res:', res);
-      setAllTag(res);
-    });
-  }, [getAllTag]);
+    navigation.addListener('focus', refresh);
+    refresh();
+    return () => navigation.removeListener('focus', refresh);
+  }, [refresh, navigation]);
 
   return (
-    <View style={styles.container}>
-      {allTag.map((_i) => (
-        <Capsule name={_i.name} key={_i.id} toDetail={() => {}} />
-      ))}
-      <View>
-        <View>
-          <Text>name</Text>
-          <TextInput onChange={updateName} ref={inputRef} />
+    <SafeAreaView>
+      <View style={styles.root}>
+        <View style={styles.container}>
+          <View style={styles.contentWrapper}>
+            {allTag.map((_i) => (
+              <Capsule name={_i.name} key={_i.id} toDetail={() => toTagDetail(_i.tagId)} />
+            ))}
+          </View>
         </View>
-        <Button title="confirm" onPress={addTag} />
+        <View style={styles.footer}>
+          <Pressable onPress={toAddPage}>
+            <AddIcon width={40} height={40} color="#3399CC" />
+          </Pressable>
+        </View>
       </View>
-    </View>
+    </SafeAreaView>
   );
 };

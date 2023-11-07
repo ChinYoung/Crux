@@ -2,8 +2,7 @@ import {
   Column,
   CreateDateColumn,
   Entity,
-  JoinTable,
-  ManyToMany,
+  ManyToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm/browser';
@@ -11,16 +10,7 @@ import { ColumnType } from '../types/DataSource';
 import { EItem } from './EItem';
 
 @Entity()
-export class ETag {
-  @Column(ColumnType.varchar)
-  name: string;
-
-  @Column(ColumnType.text, { nullable: true })
-  desc: string;
-
-  @Column(ColumnType.varchar)
-  tagId: string;
-
+export class EExtendItem {
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -30,7 +20,12 @@ export class ETag {
   @UpdateDateColumn()
   updatedAt: Date;
 
-  @ManyToMany((_type) => EItem, (item) => item.tags, { cascade: true })
-  @JoinTable()
-  items: EItem[];
+  @Column(ColumnType.varchar, { default: '名称' })
+  name: string;
+
+  @Column(ColumnType.text)
+  content: string;
+
+  @ManyToOne(() => EItem, (item) => item.extendedItems)
+  item: EItem;
 }

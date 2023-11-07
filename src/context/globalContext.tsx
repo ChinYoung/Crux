@@ -1,7 +1,8 @@
 import { FC, PropsWithChildren, createContext, useCallback, useEffect, useState } from 'react';
 import { DataSource } from 'typeorm/browser';
-import * as allEntities from '../entities';
+
 import { Db } from '../lib/Db';
+import datasource from '../lib/datasource';
 
 type TGlobalContext = {
   dbConn: DataSource | null;
@@ -26,7 +27,7 @@ export const GlobalContextProvider: FC<PropsWithChildren> = ({ children }) => {
   }, []);
 
   useEffect(() => {
-    Db.init(Object.values(allEntities)).then(() => {
+    Db.init(datasource).then(() => {
       setDbConn(Db.conn);
     });
   }, []);

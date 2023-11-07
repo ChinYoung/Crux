@@ -5,22 +5,19 @@
  * @format
  */
 
-import React, { FC } from 'react';
+import React from 'react';
 import 'reflect-metadata';
-import { Text, View } from 'react-native';
 
 import { Home } from './src/pages/Home';
 import { GlobalContextProvider } from './src/context/globalContext';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { CreateTag } from './src/pages/CreateTag';
+import { RootStackParamList } from './src/types/Router';
+import { TagDetail } from './src/pages/TagDetail';
+import { CreateItem } from './src/pages/CreateItem';
 
-const Stack = createNativeStackNavigator();
-
-const Header: FC = () => (
-  <View>
-    <Text>xxxxxxx</Text>
-  </View>
-);
+const Stack = createNativeStackNavigator<RootStackParamList>();
 
 function App(): JSX.Element {
   return (
@@ -32,7 +29,10 @@ function App(): JSX.Element {
           initialRouteName="Home"
           screenOptions={{ title: '', headerShadowVisible: false }}
         >
-          <Stack.Screen name="Home" component={Home} options={{ headerLeft: () => <Header /> }} />
+          <Stack.Screen name="Home" component={Home} options={{ headerShown: false }} />
+          <Stack.Screen name="AddTag" component={CreateTag} />
+          <Stack.Screen name="AddItem" component={CreateItem} />
+          <Stack.Screen name="TagDetail" component={TagDetail} />
         </Stack.Navigator>
       </GlobalContextProvider>
     </NavigationContainer>

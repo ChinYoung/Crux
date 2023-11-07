@@ -8,22 +8,18 @@ export class Db {
     return Db.instance.connInstance;
   }
 
-  private constructor(entities: Function[]) {
-    this.connInstance = new DataSource({
-      type: 'react-native',
-      database: 'Crux',
-      location: 'default',
-      synchronize: true,
-      entities: entities,
-    });
+  private constructor(ds: DataSource) {
+    this.connInstance = ds;
   }
 
-  static async init(entities: Function[]) {
+  static async init(ds: DataSource) {
     if (Db.instance) {
       return;
     }
-    Db.instance = new Db(entities);
+    Db.instance = new Db(ds);
     await Db.conn.initialize();
-    await Db.conn.synchronize();
+    // TODO: remember to set dropBeforeSync to false
+    const dropBeforeSync = true;
+    await Db.conn.synchronize(dropBeforeSync);
   }
 }
