@@ -4,8 +4,8 @@ import { globalContext } from '../context/globalContext';
 import { Capsule } from '../components/Capsule';
 import AddIcon from '../images/Add.svg';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { RootStackParamList } from '../types/Router';
-import { ETag } from '../entities/ETag';
+import { RootStackParamList } from '../route/Router';
+import { EGroup } from '../entities/EGroup';
 
 const styles = StyleSheet.create({
   debug: {
@@ -51,10 +51,10 @@ const styles = StyleSheet.create({
 });
 
 export const Home: FC<NativeStackScreenProps<RootStackParamList, 'Home'>> = ({ navigation }) => {
-  const [allTag, setAllTag] = useState<ETag[]>([]);
+  const [allTag, setAllTag] = useState<EGroup[]>([]);
   const { dbConn } = useContext(globalContext);
   const refresh = useCallback(async () => {
-    const res = await dbConn?.manager.find(ETag, {
+    const res = await dbConn?.manager.find(EGroup, {
       relations: {
         items: true,
       },
@@ -63,7 +63,7 @@ export const Home: FC<NativeStackScreenProps<RootStackParamList, 'Home'>> = ({ n
   }, [dbConn?.manager]);
 
   const toAddPage = useCallback(() => {
-    navigation.navigate('AddTag');
+    navigation.navigate('AddGroup');
   }, [navigation]);
 
   const toTagDetail = useCallback(

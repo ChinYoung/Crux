@@ -1,10 +1,9 @@
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { FC, useCallback, useContext, useEffect, useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
-import { RootStackParamList } from '../types/Router';
-import { ETag } from '../entities/ETag';
+import { RootStackParamList } from '../route/Router';
+import { EGroup } from '../entities/EGroup';
 import { globalContext } from '../context/globalContext';
-import AddIcon from '../images/Add.svg';
 import { EItem } from '../entities/EItem';
 
 const styles = StyleSheet.create({
@@ -13,6 +12,7 @@ const styles = StyleSheet.create({
     height: '100%',
     padding: 8,
     display: 'flex',
+    justifyContent: 'flex-start',
   },
   title: {
     fontSize: 32,
@@ -23,9 +23,29 @@ const styles = StyleSheet.create({
     paddingLeft: 4,
     fontSize: 12,
   },
+  divider: {
+    width: '100%',
+    borderColor: '#ccc',
+    borderStyle: 'solid',
+    borderBottomWidth: 1,
+    marginTop: 8,
+  },
   contentWrapper: {
     marginTop: 12,
     flex: 1,
+  },
+  addButton: {
+    width: '100%',
+    paddingVertical: 4,
+    backgroundColor: '#0099CC',
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 4,
+    marginTop: 4,
+  },
+  addButtonText: {
+    color: '#fff',
   },
   bottomContainer: {
     display: 'flex',
@@ -34,7 +54,7 @@ const styles = StyleSheet.create({
   },
 });
 
-export const TagDetail: FC<NativeStackScreenProps<RootStackParamList, 'TagDetail'>> = ({
+export const GroupDetail: FC<NativeStackScreenProps<RootStackParamList, 'GroupDetail'>> = ({
   route,
   navigation,
 }) => {
@@ -42,18 +62,18 @@ export const TagDetail: FC<NativeStackScreenProps<RootStackParamList, 'TagDetail
     params: { id },
   } = route;
   const { dbConn } = useContext(globalContext);
-  const [tag, setTag] = useState<ETag | null>(null);
+  const [tag, setTag] = useState<EGroup | null>(null);
 
   const toAddItem = useCallback(() => {
     if (!tag) {
       return;
     }
-    navigation.navigate('AddItem', { tagId: tag.tagId });
+    navigation.navigate('AddItem', { tagId: tag.tagId, tagName: tag.name });
   }, [navigation, tag]);
 
   const refresh = useCallback(() => {
     dbConn
-      ?.getRepository(ETag)
+      ?.getRepository(EGroup)
       .findOne({ relations: { items: true }, where: { tagId: id } })
       .then((res) => {
         if (!res) {
@@ -63,29 +83,44 @@ export const TagDetail: FC<NativeStackScreenProps<RootStackParamList, 'TagDetail
       });
   }, [dbConn, id]);
 
+  const navToItemDetail = useCallback(
+    (itemId: string, alias: string) => {
+      navigation.navigate('ItemDetail', { itemId, alias });
+    },
+    [navigation],
+  );
+
   useEffect(() => {
     navigation.addListener('focus', refresh);
     refresh();
     return () => navigation.removeListener('focus', refresh);
   }, [refresh, navigation]);
 
+  useEffect(() => {
+    navigation.setOptions({
+      title: tag?.name,
+    });
+  }, [navigation, tag?.name]);
+
   return (
     <>
       {tag ? (
         <View style={styles.container}>
           {/* <Text>{tag.tagId}</Text> */}
-          <Text style={styles.title}>{tag.name}</Text>
+          {/* <Text style={styles.title}>{tag.name}</Text> */}
           <Text style={styles.description}>{tag.desc}</Text>
+          <View style={styles.divider} />
           <View style={styles.contentWrapper}>
             {tag.items.map((i) => (
-              <TagItem key={i.id} item={i} />
+              <TagItem key={i.id} item={i} navToItemDetail={navToItemDetail} />
             ))}
           </View>
-          <View style={styles.bottomContainer}>
-            <Pressable onPress={toAddItem}>
-              <AddIcon width={40} height={40} color="#3399CC" />
-            </Pressable>
-          </View>
+          <Pressable onPress={toAddItem} style={styles.addButton}>
+            <Text style={styles.addButtonText}>Add</Text>
+            {/* <AddIcon width={40} height={40} color="#3399CC" /> */}
+          </Pressable>
+          {/* <View style={styles.bottomContainer}>
+          </View> */}
         </View>
       ) : null}
     </>
@@ -114,13 +149,18 @@ const tagItemStyles = StyleSheet.create({
   },
 });
 
-const TagItem: FC<{ item: EItem }> = ({ item: { alias, desc } }) => {
+const TagItem: FC<{ item: EItem; navToItemDetail: (itemId: string, alias: string) => void }> = ({
+  item: { alias, desc, itemId },
+  navToItemDetail,
+}) => {
   return (
-    <View style={tagItemStyles.container}>
-      <Text style={tagItemStyles.cell}>{alias}</Text>
-      <Text numberOfLines={1} style={[tagItemStyles.cell, tagItemStyles.value]}>
-        {desc}
-      </Text>
-    </View>
+    <Pressable onPress={() => navToItemDetail(itemId, alias)}>
+      <View style={tagItemStyles.container}>
+        <Text style={tagItemStyles.cell}>{alias}</Text>
+        <Text numberOfLines={1} style={[tagItemStyles.cell, tagItemStyles.value]}>
+          {desc}
+        </Text>
+      </View>
+    </Pressable>
   );
 };

@@ -12,10 +12,11 @@ import { Home } from './src/pages/Home';
 import { GlobalContextProvider } from './src/context/globalContext';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { CreateTag } from './src/pages/CreateTag';
-import { RootStackParamList } from './src/types/Router';
-import { TagDetail } from './src/pages/TagDetail';
-import { CreateItem } from './src/pages/CreateItem';
+import { CreateGroup } from './src/pages/CreateGroup';
+import { RootStackParamList } from './src/route/Router';
+import { GroupDetail } from './src/pages/GroupDetail';
+import { AddItem } from './src/pages/AddItem';
+import { ItemDetail } from './src/pages/ItemDetail';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -30,9 +31,18 @@ function App(): JSX.Element {
           screenOptions={{ title: '', headerShadowVisible: false }}
         >
           <Stack.Screen name="Home" component={Home} options={{ headerShown: false }} />
-          <Stack.Screen name="AddTag" component={CreateTag} />
-          <Stack.Screen name="AddItem" component={CreateItem} />
-          <Stack.Screen name="TagDetail" component={TagDetail} />
+          <Stack.Screen
+            name="AddGroup"
+            component={CreateGroup}
+            options={{ title: 'Create A Group' }}
+          />
+          <Stack.Screen name="AddItem" component={AddItem} />
+          <Stack.Screen name="GroupDetail" component={GroupDetail} />
+          <Stack.Screen
+            name="ItemDetail"
+            component={ItemDetail}
+            options={{ presentation: 'modal' }}
+          />
         </Stack.Navigator>
       </GlobalContextProvider>
     </NavigationContainer>

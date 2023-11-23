@@ -11,10 +11,10 @@ import {
 } from 'react-native';
 import { globalContext } from '../context/globalContext';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { RootStackParamList } from '../types/Router';
+import { RootStackParamList } from '../route/Router';
 import 'react-native-get-random-values';
 import { nanoid } from 'nanoid';
-import { ETag } from '../entities/ETag';
+import { EGroup } from '../entities/EGroup';
 
 const styles = StyleSheet.create({
   container: {
@@ -57,7 +57,7 @@ const styles = StyleSheet.create({
   },
 });
 
-export const CreateTag: FC<NativeStackScreenProps<RootStackParamList, 'AddTag'>> = ({
+export const CreateGroup: FC<NativeStackScreenProps<RootStackParamList, 'AddGroup'>> = ({
   navigation,
 }) => {
   const inputRef = createRef<TextInput>();
@@ -81,14 +81,13 @@ export const CreateTag: FC<NativeStackScreenProps<RootStackParamList, 'AddTag'>>
       Alert.alert('a name is required');
       return;
     }
-    const newTag = new ETag();
+    const newTag = new EGroup();
     newTag.name = newName;
     newTag.tagId = nanoid();
     newTag.desc = newDesc;
     dbConn.manager
       .save(newTag)
-      .then((res) => {
-        console.log('🚀 ~ file: CreateTag.tsx:99 ~ .then ~ res:', res);
+      .then((_res) => {
         inputRef.current?.clear();
         navigation.goBack();
       })

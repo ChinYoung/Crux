@@ -1,5 +1,5 @@
 import { DataSource } from 'typeorm/browser';
-import { ETag } from '../entities/ETag';
+import { EGroup } from '../entities/EGroup';
 import { EItem } from '../entities/EItem';
 import { EExtendItem } from '../entities/EExtendItem';
 
@@ -8,6 +8,6 @@ export default new DataSource({
   database: 'Crux',
   location: 'default',
   synchronize: true,
-  entities: [ETag, EItem, EExtendItem],
+  entities: [EGroup, EItem, EExtendItem],
   migrations: ['migrations'],
 });

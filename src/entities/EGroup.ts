@@ -11,7 +11,7 @@ import { ColumnType } from '../types/DataSource';
 import { EItem } from './EItem';
 
 @Entity()
-export class ETag {
+export class EGroup {
   @Column(ColumnType.varchar)
   name: string;
 

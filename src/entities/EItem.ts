@@ -8,7 +8,7 @@ import {
   OneToMany,
 } from 'typeorm/browser';
 import { ColumnType } from '../types/DataSource';
-import { ETag } from './ETag';
+import { EGroup } from './EGroup';
 import { EExtendItem } from './EExtendItem';
 
 @Entity()
@@ -37,9 +37,9 @@ export class EItem {
   @UpdateDateColumn()
   updatedAt: Date;
 
-  @ManyToMany((_type) => ETag, (tag) => tag.items)
-  tags: ETag[];
+  @ManyToMany((_type) => EGroup, (tag) => tag.items)
+  tags: EGroup[];
 
-  @OneToMany(() => EExtendItem, (extendedItem) => extendedItem.item)
+  @OneToMany(() => EExtendItem, (extendedItem) => extendedItem.item, { cascade: true })
   extendedItems: EExtendItem[];
 }

@@ -1,6 +1,6 @@
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { FC, createRef, useCallback, useContext, useState } from 'react';
-import { RootStackParamList } from '../types/Router';
+import { FC, createRef, useCallback, useContext, useEffect, useState } from 'react';
+import { RootStackParamList } from '../route/Router';
 import {
   NativeSyntheticEvent,
   Pressable,
@@ -13,19 +13,17 @@ import { TextInput } from 'react-native';
 import { Alert } from 'react-native';
 import { EItem } from '../entities/EItem';
 import { globalContext } from '../context/globalContext';
-import { ETag } from '../entities/ETag';
+import { EGroup } from '../entities/EGroup';
 import 'react-native-get-random-values';
 import { nanoid } from 'nanoid';
 
-// TODO: update this
-
-export const CreateItem: FC<NativeStackScreenProps<RootStackParamList, 'AddItem'>> = ({
+export const AddItem: FC<NativeStackScreenProps<RootStackParamList, 'AddItem'>> = ({
   navigation,
   route,
 }) => {
   const { dbConn } = useContext(globalContext);
   const inputRef = createRef<TextInput>();
-  const { tagId } = route.params;
+  const { tagId, tagName } = route.params;
 
   const [alias, setAlias] = useState<string>('');
   const [newName, setNewName] = useState<string>('');
@@ -54,7 +52,7 @@ export const CreateItem: FC<NativeStackScreenProps<RootStackParamList, 'AddItem'
       return;
     }
     dbConn.manager
-      .findOne(ETag, {
+      .findOne(EGroup, {
         where: { tagId },
         relations: { items: true },
       })
@@ -79,6 +77,13 @@ export const CreateItem: FC<NativeStackScreenProps<RootStackParamList, 'AddItem'
           });
       });
   }, [alias, dbConn, navigation, newContent, newDesc, newName, tagId]);
+
+  useEffect(() => {
+    navigation.setOptions({
+      title: `Add items to <${tagName}>`,
+    });
+  }, [navigation, tagName]);
+
   return (
     <View style={styles.container}>
       <View style={styles.inputs}>
