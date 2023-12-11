@@ -11,13 +11,13 @@ import {
 } from 'react-native';
 import { TextInput } from 'react-native';
 import { Alert } from 'react-native';
-import { EItem } from '../entities/EItem';
 import { globalContext } from '../context/globalContext';
 import { EGroup } from '../entities/EGroup';
 import 'react-native-get-random-values';
 import { nanoid } from 'nanoid';
+import { EAccount } from '../entities/EAccount';
 
-export const AddItem: FC<NativeStackScreenProps<RootStackParamList, 'AddItem'>> = ({
+export const AddAccount: FC<NativeStackScreenProps<RootStackParamList, 'AddItem'>> = ({
   navigation,
   route,
 }) => {
@@ -25,19 +25,19 @@ export const AddItem: FC<NativeStackScreenProps<RootStackParamList, 'AddItem'>> 
   const inputRef = createRef<TextInput>();
   const { tagId, tagName } = route.params;
 
-  const [alias, setAlias] = useState<string>('');
+  const [account, setAccount] = useState<string>('');
   const [newName, setNewName] = useState<string>('');
-  const [newContent, setNewContent] = useState<string>('');
+  const [password, setPassword] = useState<string>('');
   const [newDesc, setDesc] = useState<string>('');
 
-  const updateAlias = useCallback((_e: NativeSyntheticEvent<TextInputChangeEventData>) => {
-    setAlias(_e.nativeEvent.text);
+  const updateAccount = useCallback((_e: NativeSyntheticEvent<TextInputChangeEventData>) => {
+    setAccount(_e.nativeEvent.text);
   }, []);
   const updateName = useCallback((_e: NativeSyntheticEvent<TextInputChangeEventData>) => {
     setNewName(_e.nativeEvent.text);
   }, []);
-  const updateContent = useCallback((_e: NativeSyntheticEvent<TextInputChangeEventData>) => {
-    setNewContent(_e.nativeEvent.text);
+  const updatePassword = useCallback((_e: NativeSyntheticEvent<TextInputChangeEventData>) => {
+    setPassword(_e.nativeEvent.text);
   }, []);
   const updateDesc = useCallback((_e: NativeSyntheticEvent<TextInputChangeEventData>) => {
     setDesc(_e.nativeEvent.text);
@@ -54,19 +54,19 @@ export const AddItem: FC<NativeStackScreenProps<RootStackParamList, 'AddItem'>> 
     dbConn.manager
       .findOne(EGroup, {
         where: { tagId },
-        relations: { items: true },
+        relations: { accountList: true },
       })
       .then((tag) => {
         if (!tag) {
           return;
         }
-        const newItem = new EItem();
-        newItem.alias = alias;
-        newItem.name = newName;
-        newItem.content = newContent;
-        newItem.desc = newDesc;
-        newItem.itemId = nanoid();
-        tag.items.push(newItem);
+        const newAccount = new EAccount();
+        newAccount.name = newName;
+        newAccount.account = account;
+        newAccount.password = password;
+        newAccount.desc = newDesc;
+        newAccount.accountId = nanoid();
+        tag.accountList.push(newAccount);
         dbConn.manager
           .save(tag)
           .then((_res) => {
@@ -76,11 +76,11 @@ export const AddItem: FC<NativeStackScreenProps<RootStackParamList, 'AddItem'>> 
             console.log('🚀 ~ file: CreateTag.tsx:48 ~ addTag ~ err:', err);
           });
       });
-  }, [alias, dbConn, navigation, newContent, newDesc, newName, tagId]);
+  }, [account, dbConn, navigation, password, newDesc, newName, tagId]);
 
   useEffect(() => {
     navigation.setOptions({
-      title: `Add items to <${tagName}>`,
+      title: `Create an account`,
     });
   }, [navigation, tagName]);
 
@@ -88,16 +88,16 @@ export const AddItem: FC<NativeStackScreenProps<RootStackParamList, 'AddItem'>> 
     <View style={styles.container}>
       <View style={styles.inputs}>
         <View>
-          <Text style={styles.title}>Alias</Text>
-          <TextInput style={styles.nameInput} onChange={updateAlias} ref={inputRef} />
-        </View>
-        <View>
           <Text style={styles.title}>Name</Text>
-          <TextInput style={styles.nameInput} onChange={updateName} ref={inputRef} />
+          <TextInput style={styles.input} onChange={updateName} ref={inputRef} />
         </View>
         <View>
-          <Text style={styles.title}>Content</Text>
-          <TextInput style={styles.nameInput} onChange={updateContent} ref={inputRef} />
+          <Text style={styles.title}>Account</Text>
+          <TextInput style={styles.input} onChange={updateAccount} ref={inputRef} />
+        </View>
+        <View>
+          <Text style={styles.title}>Password</Text>
+          <TextInput style={styles.input} onChange={updatePassword} ref={inputRef} />
         </View>
         <View>
           <Text style={styles.title}>Dscription</Text>
@@ -125,20 +125,22 @@ const styles = StyleSheet.create({
     gap: 16,
   },
   title: {
-    color: '#003399',
+    color: '#000',
   },
-  nameInput: {
+  input: {
     borderStyle: 'solid',
-    borderColor: '#ccc',
+    borderColor: '#ddd',
     borderWidth: 1,
     borderRadius: 4,
+    padding: 4,
   },
   descInput: {
     borderStyle: 'solid',
-    borderColor: '#ccc',
+    borderColor: '#ddd',
     borderWidth: 1,
     minHeight: 64,
     borderRadius: 4,
+    padding: 4,
   },
   confirmButton: {
     backgroundColor: '#333399',

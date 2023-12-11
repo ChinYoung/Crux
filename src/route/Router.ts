@@ -3,5 +3,5 @@ export type RootStackParamList = {
   AddGroup: undefined;
   AddItem: { tagId: string; tagName: string };
   GroupDetail: { id: string };
-  ItemDetail: { itemId: string; alias: string };
+  AccountDetail: { accountId: string; name: string };
 };

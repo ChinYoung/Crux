@@ -1,30 +1,26 @@
 import {
-  Entity,
-  PrimaryGeneratedColumn,
-  UpdateDateColumn,
+  Column,
   CreateDateColumn,
+  Entity,
   ManyToMany,
   OneToMany,
-  Column,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
 } from 'typeorm/browser';
+import { ColumnType } from '../types/DataSourceTypes';
 import { EGroup } from './EGroup';
 import { EExtendItem } from './EExtendItem';
-import { EnuTypes } from '../types/Enum';
-import { ColumnType } from '../types/DataSourceTypes';
 
 @Entity()
-export class EItem {
+export class EAccount {
   @PrimaryGeneratedColumn()
   id: number;
 
   @Column(ColumnType.varchar, { nullable: true })
-  itemId: string;
+  accountId: string;
 
   @Column(ColumnType.varchar, { default: '名称' })
   name: string;
-
-  @Column(ColumnType.text, { nullable: true })
-  type: EnuTypes;
 
   @CreateDateColumn()
   createdAt: Date;
@@ -37,4 +33,13 @@ export class EItem {
 
   @OneToMany(() => EExtendItem, (extendedItem) => extendedItem.item, { cascade: true })
   extendedItems: EExtendItem[];
+
+  @Column(ColumnType.varchar)
+  account: string;
+
+  @Column(ColumnType.text)
+  password: string;
+
+  @Column(ColumnType.text)
+  desc: string;
 }

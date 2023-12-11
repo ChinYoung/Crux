@@ -15,8 +15,8 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { CreateGroup } from './src/pages/CreateGroup';
 import { RootStackParamList } from './src/route/Router';
 import { GroupDetail } from './src/pages/GroupDetail';
-import { AddItem } from './src/pages/AddItem';
-import { ItemDetail } from './src/pages/ItemDetail';
+import { AddAccount } from './src/pages/AddAccount';
+import { AccountDetail } from './src/pages/AccountDetail';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -36,11 +36,11 @@ function App(): JSX.Element {
             component={CreateGroup}
             options={{ title: 'Create A Group' }}
           />
-          <Stack.Screen name="AddItem" component={AddItem} />
+          <Stack.Screen name="AddItem" component={AddAccount} options={{ presentation: 'modal' }} />
           <Stack.Screen name="GroupDetail" component={GroupDetail} />
           <Stack.Screen
-            name="ItemDetail"
-            component={ItemDetail}
+            name="AccountDetail"
+            component={AccountDetail}
             options={{ presentation: 'modal' }}
           />
         </Stack.Navigator>

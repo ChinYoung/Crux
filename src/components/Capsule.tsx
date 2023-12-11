@@ -8,7 +8,7 @@ export type TCapsuleProps = {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#3399CC',
+    backgroundColor: '#333399',
     borderRadius: 6,
     paddingVertical: 8,
     paddingHorizontal: 16,

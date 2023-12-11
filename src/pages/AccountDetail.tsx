@@ -8,19 +8,19 @@ import {
   TextInputChangeEventData,
   View,
 } from 'react-native';
-import { EItem } from '../entities/EItem';
 import { globalContext } from '../context/globalContext';
 import { StyleSheet } from 'react-native';
 import { TextInput } from 'react-native';
 import { EExtendItem } from '../entities/EExtendItem';
+import { EAccount } from '../entities/EAccount';
 
-export const ItemDetail: FC<NativeStackScreenProps<RootStackParamList, 'ItemDetail'>> = ({
+export const AccountDetail: FC<NativeStackScreenProps<RootStackParamList, 'AccountDetail'>> = ({
   navigation,
   route,
 }) => {
-  const { itemId, alias } = route.params;
+  const { accountId, name } = route.params;
   const { dbConn } = useContext(globalContext);
-  const [item, setItem] = useState<EItem>();
+  const [item, setItem] = useState<EAccount>();
   const [showAddExtend, setShowAddExtend] = useState<boolean>(false);
 
   const [extendName, setExtendName] = useState<string>('');
@@ -28,8 +28,8 @@ export const ItemDetail: FC<NativeStackScreenProps<RootStackParamList, 'ItemDeta
 
   const refresh = useCallback(() => {
     dbConn?.manager
-      .findOne(EItem, {
-        where: { itemId },
+      .findOne(EAccount, {
+        where: { accountId },
         relations: { extendedItems: true },
       })
       .then((itemValue) => {
@@ -38,7 +38,7 @@ export const ItemDetail: FC<NativeStackScreenProps<RootStackParamList, 'ItemDeta
         }
         setItem(itemValue);
       });
-  }, [dbConn?.manager, itemId]);
+  }, [accountId, dbConn?.manager]);
 
   const showAddExtendedItem = useCallback(() => {
     setShowAddExtend(true);
@@ -77,8 +77,8 @@ export const ItemDetail: FC<NativeStackScreenProps<RootStackParamList, 'ItemDeta
   }, []);
 
   useEffect(() => {
-    navigation.setOptions({ title: alias });
-  }, [alias, navigation]);
+    navigation.setOptions({ title: name });
+  }, [name, navigation]);
   useEffect(() => {
     refresh();
   }, [refresh]);
@@ -91,8 +91,8 @@ export const ItemDetail: FC<NativeStackScreenProps<RootStackParamList, 'ItemDeta
           {/* <Text>description:</Text> */}
           <Text style={styles.description}>{item?.desc}</Text>
         </View>
-        <LocalKeyValue keyName="content:" value={item?.content ?? ''} />
-        <LocalKeyValue keyName="alias:" value={item?.alias ?? ''} />
+        <LocalKeyValue keyName="content:" value={item?.password ?? ''} />
+        <LocalKeyValue keyName="name:" value={item?.name ?? ''} />
         {item?.extendedItems.map((_e) => (
           <LocalKeyValue keyName={_e.name} value={_e.content} key={_e.id} />
         ))}

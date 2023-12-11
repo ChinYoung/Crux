@@ -7,8 +7,8 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm/browser';
-import { ColumnType } from '../types/DataSource';
-import { EItem } from './EItem';
+import { ColumnType } from '../types/DataSourceTypes';
+import { EAccount } from './EAccount';
 
 @Entity()
 export class EGroup {
@@ -30,7 +30,7 @@ export class EGroup {
   @UpdateDateColumn()
   updatedAt: Date;
 
-  @ManyToMany((_type) => EItem, (item) => item.tags, { cascade: true })
+  @ManyToMany((_type) => EAccount, (item) => item.tags, { cascade: true })
   @JoinTable()
-  items: EItem[];
+  accountList: EAccount[];
 }

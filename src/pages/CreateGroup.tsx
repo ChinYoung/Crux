@@ -15,6 +15,7 @@ import { RootStackParamList } from '../route/Router';
 import 'react-native-get-random-values';
 import { nanoid } from 'nanoid';
 import { EGroup } from '../entities/EGroup';
+import { PredefinedColors } from '../lib/Constants';
 
 const styles = StyleSheet.create({
   container: {
@@ -28,7 +29,7 @@ const styles = StyleSheet.create({
     gap: 16,
   },
   title: {
-    color: '#003399',
+    color: '#000',
   },
   nameInput: {
     borderStyle: 'solid',
@@ -73,6 +74,10 @@ export const CreateGroup: FC<NativeStackScreenProps<RootStackParamList, 'AddGrou
     setDesc(_e.nativeEvent.text);
   }, []);
 
+  const onSelectColor = useCallback((color: string) => {
+    console.log('🚀 ~ file: CreateGroup.tsx:78 ~ onSelectColor ~ color:', color);
+  }, []);
+
   const addTag = useCallback(async () => {
     if (!dbConn) {
       return;
@@ -97,6 +102,7 @@ export const CreateGroup: FC<NativeStackScreenProps<RootStackParamList, 'AddGrou
   }, [dbConn, inputRef, navigation, newDesc, newName]);
   return (
     <View style={styles.container}>
+      {/* top, inputs */}
       <View style={styles.inputs}>
         <View>
           <Text style={styles.title}>name</Text>
@@ -106,12 +112,48 @@ export const CreateGroup: FC<NativeStackScreenProps<RootStackParamList, 'AddGrou
           <Text style={styles.title}>description</Text>
           <TextInput style={styles.descInput} multiline={true} onChange={updateDesc} />
         </View>
+        {/* color picker */}
+        <View>
+          <Text style={styles.title}>Color</Text>
+          <View>
+            {PredefinedColors.dark.map((color) => (
+              <ColorButton isDark={true} color={color} onClick={onSelectColor} />
+            ))}
+            <Text>color</Text>
+          </View>
+        </View>
       </View>
+      {/* bottom buttons */}
       <Pressable onPress={addTag}>
         <View style={styles.confirmButton}>
           <Text style={styles.confirmText}>confirm</Text>
         </View>
       </Pressable>
     </View>
+  );
+};
+
+const ColorButton: FC<{ isDark: boolean; color: string; onClick: (color: string) => void }> = ({
+  isDark,
+  color,
+  onClick,
+}) => {
+  const ColorButtonStyle = () =>
+    StyleSheet.create({
+      darkBgContent: {
+        backgroundColor: color,
+        color: '#fff',
+      },
+      lightBgContent: {
+        backgroundColor: color,
+        color: '#000',
+      },
+    });
+  return (
+    <Pressable onPress={() => onClick(color)}>
+      <Text style={isDark ? ColorButtonStyle().darkBgContent : ColorButtonStyle().lightBgContent}>
+        {color}
+      </Text>
+    </Pressable>
   );
 };

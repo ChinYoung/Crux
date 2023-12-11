@@ -6,8 +6,8 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm/browser';
-import { ColumnType } from '../types/DataSource';
-import { EItem } from './EItem';
+import { ColumnType } from '../types/DataSourceTypes';
+import { EAccount } from './EAccount';
 
 @Entity()
 export class EExtendItem {
@@ -26,6 +26,6 @@ export class EExtendItem {
   @Column(ColumnType.text)
   content: string;
 
-  @ManyToOne(() => EItem, (item) => item.extendedItems)
-  item: EItem;
+  @ManyToOne(() => EAccount, (item) => item.extendedItems)
+  item: EAccount;
 }

@@ -56,7 +56,7 @@ export const Home: FC<NativeStackScreenProps<RootStackParamList, 'Home'>> = ({ n
   const refresh = useCallback(async () => {
     const res = await dbConn?.manager.find(EGroup, {
       relations: {
-        items: true,
+        accountList: true,
       },
     });
     res && setAllTag(res);
@@ -69,7 +69,7 @@ export const Home: FC<NativeStackScreenProps<RootStackParamList, 'Home'>> = ({ n
   const toTagDetail = useCallback(
     (id: string) => {
       // TODO: implement this
-      navigation.navigate('TagDetail', { id });
+      navigation.navigate('GroupDetail', { id });
     },
     [navigation],
   );
@@ -92,7 +92,7 @@ export const Home: FC<NativeStackScreenProps<RootStackParamList, 'Home'>> = ({ n
         </View>
         <View style={styles.footer}>
           <Pressable onPress={toAddPage}>
-            <AddIcon width={40} height={40} color="#3399CC" />
+            <AddIcon width={40} height={40} color="#333399" />
           </Pressable>
         </View>
       </View>
