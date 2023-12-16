@@ -92,17 +92,21 @@ export const AccountDetail: FC<NativeStackScreenProps<RootStackParamList, 'Accou
           {/* <Text>description:</Text> */}
           <Text style={styles.description}>{item?.desc}</Text>
         </View>
-        <LocalKeyValue keyName="content:" value={item?.password ?? ''} />
         <LocalKeyValue keyName="name:" value={item?.name ?? ''} />
+        <LocalKeyValue keyName="account:" value={item?.account ?? ''} />
+        <LocalKeyValue keyName="password:" value={item?.password ?? ''} />
         {item?.extendedItems.map((_e) => (
           <LocalKeyValue keyName={_e.name} value={_e.content} key={_e.id} />
         ))}
         {showAddExtend ? (
           <View style={styles.addExtendContainer}>
-            <TextInput style={styles.addExtendName} onChange={updateExtendName} />
-            <TextInput style={styles.addExtendValue} onChange={updateExtengValue} />
+            <TextInput style={styles.addExtendName} onChange={updateExtendName} placeholder='Name' />
+            <TextInput style={styles.addExtendValue} onChange={updateExtengValue} placeholder='Value' />
           </View>
         ) : null}
+      </View>
+      {/* buttons on the bottom */}
+      <View style={styles.operations}>
         {showAddExtend ? (
           <View style={styles.addExtentdButtonContainer}>
             <NegtiveButton pressHandler={cancelAddExtend} name="Cancel" />
@@ -111,15 +115,9 @@ export const AccountDetail: FC<NativeStackScreenProps<RootStackParamList, 'Accou
         ) : (
           <PrimaryButton pressHandler={showAddExtendedItem} name="Add" />
         )}
-      </View>
-      {/* buttons on the bottom */}
-      <View style={styles.operations}>
-        <View style={{ flex: 1, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+        {/* <View style={{ flex: 1, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
           <Text>Favirite</Text>
-        </View>
-        <View style={{ width: 2 }}>
-          <Text>·</Text>
-        </View>
+        </View> */}
       </View>
     </View>
   );
@@ -141,6 +139,7 @@ const styles = StyleSheet.create({
     flex: 1,
     display: 'flex',
     justifyContent: 'space-between',
+    padding: 8
   },
   contentContainer: {
     padding: 12,
@@ -164,9 +163,6 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   operations: {
-    padding: 24,
-    display: 'flex',
-    flexDirection: 'row',
   },
   addExtentdButtonContainer: {
     display: 'flex',
@@ -189,20 +185,20 @@ const styles = StyleSheet.create({
   addExtendContainer: {
     width: '100%',
     display: 'flex',
-    flexDirection: 'row',
     gap: 4,
     marginVertical: 8,
   },
   addExtendName: {
     backgroundColor: '#fff',
     borderRadius: 2,
-    padding: 2,
-    flex: 1,
+    padding: 4,
+    lineHeight: 16
   },
   addExtendValue: {
     borderRadius: 2,
-    padding: 2,
+    padding: 4,
     backgroundColor: '#fff',
-    flex: 3,
+    lineHeight: 16
+
   },
 });

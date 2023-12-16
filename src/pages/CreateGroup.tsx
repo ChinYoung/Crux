@@ -136,20 +136,23 @@ const ColorButton: FC<{ isDark: boolean; color: string; onClick: (color: string)
   color,
   onClick,
 }) => {
-  const ColorButtonStyle = () =>
-    StyleSheet.create({
-      darkBgContent: {
-        backgroundColor: color,
-        color: '#fff',
-      },
-      lightBgContent: {
-        backgroundColor: color,
-        color: '#000',
-      },
-    });
+  const ColorButtonStyle = StyleSheet.create({
+    container: {
+      width: 16,
+      height: 16,
+    },
+    darkBgContent: {
+      backgroundColor: color,
+      color: '#fff',
+    },
+    lightBgContent: {
+      backgroundColor: color,
+      color: '#000',
+    },
+  });
   return (
-    <Pressable onPress={() => onClick(color)}>
-      <Text style={isDark ? ColorButtonStyle().darkBgContent : ColorButtonStyle().lightBgContent}>
+    <Pressable onPress={() => onClick(color)} style={ColorButtonStyle.container}>
+      <Text style={isDark ? ColorButtonStyle.darkBgContent : ColorButtonStyle.lightBgContent}>
         {color}
       </Text>
     </Pressable>
