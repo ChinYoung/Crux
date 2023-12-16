@@ -17,12 +17,25 @@ import { RootStackParamList } from './src/route/Router';
 import { GroupDetail } from './src/pages/GroupDetail';
 import { AddAccount } from './src/pages/AddAccount';
 import { AccountDetail } from './src/pages/AccountDetail';
+import { LIGHT_DEFAULT_COLOR } from './src/theme/color';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
 function App(): JSX.Element {
   return (
-    <NavigationContainer>
+    <NavigationContainer
+      theme={{
+        dark: false,
+        colors: {
+          background: LIGHT_DEFAULT_COLOR.background.primary,
+          primary: '#005485',
+          card: 'rgb(255, 255, 255)',
+          text: '#005485',
+          border: '#74a892',
+          notification: 'rgb(255, 69, 58)',
+        },
+      }}
+    >
       <GlobalContextProvider>
         {/* <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} /> */}
         {/* <ActivityIndicator /> */}
@@ -34,14 +47,27 @@ function App(): JSX.Element {
           <Stack.Screen
             name="AddGroup"
             component={CreateGroup}
-            options={{ title: 'Create A Group' }}
+            options={{
+              title: 'Create A Group',
+              headerStyle: {
+                backgroundColor: LIGHT_DEFAULT_COLOR.background.primary,
+              },
+            }}
           />
           <Stack.Screen name="AddItem" component={AddAccount} options={{ presentation: 'modal' }} />
-          <Stack.Screen name="GroupDetail" component={GroupDetail} />
+          <Stack.Screen
+            name="GroupDetail"
+            component={GroupDetail}
+            options={{
+              headerStyle: {
+                backgroundColor: LIGHT_DEFAULT_COLOR.background.primary,
+              },
+            }}
+          />
           <Stack.Screen
             name="AccountDetail"
             component={AccountDetail}
-            options={{ presentation: 'modal' }}
+            options={{ presentation: 'modal', headerLargeTitle: false }}
           />
         </Stack.Navigator>
       </GlobalContextProvider>

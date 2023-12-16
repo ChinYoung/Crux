@@ -13,6 +13,7 @@ import { StyleSheet } from 'react-native';
 import { TextInput } from 'react-native';
 import { EExtendItem } from '../entities/EExtendItem';
 import { EAccount } from '../entities/EAccount';
+import { NegtiveButton, PrimaryButton } from '../components/Button';
 
 export const AccountDetail: FC<NativeStackScreenProps<RootStackParamList, 'AccountDetail'>> = ({
   navigation,
@@ -104,19 +105,11 @@ export const AccountDetail: FC<NativeStackScreenProps<RootStackParamList, 'Accou
         ) : null}
         {showAddExtend ? (
           <View style={styles.addExtentdButtonContainer}>
-            <Pressable onPress={confirmToAddExtend} style={styles.addButton}>
-              <Text style={styles.addButtonText}>Confirm</Text>
-            </Pressable>
-            <Pressable onPress={cancelAddExtend} style={styles.addButton}>
-              <Text style={styles.addButtonText}>Cancel</Text>
-            </Pressable>
+            <NegtiveButton pressHandler={cancelAddExtend} name="Cancel" />
+            <PrimaryButton pressHandler={confirmToAddExtend} name="Confirm" />
           </View>
         ) : (
-          <Pressable onPress={showAddExtendedItem} style={styles.addButton}>
-            <View>
-              <Text style={styles.addButtonText}>Add</Text>
-            </View>
-          </Pressable>
+          <PrimaryButton pressHandler={showAddExtendedItem} name="Add" />
         )}
       </View>
       {/* buttons on the bottom */}
@@ -157,7 +150,6 @@ const styles = StyleSheet.create({
   },
   description: {
     fontSize: 12,
-    color: '#000',
     opacity: 0.6,
     paddingLeft: 8,
   },
@@ -166,7 +158,6 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 14,
-    color: '#000',
     opacity: 0.6,
   },
   content: {

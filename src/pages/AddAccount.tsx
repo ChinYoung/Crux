@@ -16,6 +16,7 @@ import { EGroup } from '../entities/EGroup';
 import 'react-native-get-random-values';
 import { nanoid } from 'nanoid';
 import { EAccount } from '../entities/EAccount';
+import { PrimaryButton } from '../components/Button';
 
 export const AddAccount: FC<NativeStackScreenProps<RootStackParamList, 'AddItem'>> = ({
   navigation,
@@ -88,27 +89,23 @@ export const AddAccount: FC<NativeStackScreenProps<RootStackParamList, 'AddItem'
     <View style={styles.container}>
       <View style={styles.inputs}>
         <View>
-          <Text style={styles.title}>Name</Text>
+          <Text>Name</Text>
           <TextInput style={styles.input} onChange={updateName} ref={inputRef} />
         </View>
         <View>
-          <Text style={styles.title}>Account</Text>
+          <Text>Account</Text>
           <TextInput style={styles.input} onChange={updateAccount} ref={inputRef} />
         </View>
         <View>
-          <Text style={styles.title}>Password</Text>
+          <Text>Password</Text>
           <TextInput style={styles.input} onChange={updatePassword} ref={inputRef} />
         </View>
         <View>
-          <Text style={styles.title}>Dscription</Text>
+          <Text>Dscription</Text>
           <TextInput style={styles.descInput} multiline={true} onChange={updateDesc} />
         </View>
       </View>
-      <Pressable onPress={addItem}>
-        <View style={styles.confirmButton}>
-          <Text style={styles.confirmText}>confirm</Text>
-        </View>
-      </Pressable>
+      <PrimaryButton pressHandler={addItem} name="Confirm" />
     </View>
   );
 };
@@ -124,19 +121,14 @@ const styles = StyleSheet.create({
     display: 'flex',
     gap: 16,
   },
-  title: {
-    color: '#000',
-  },
   input: {
     borderStyle: 'solid',
-    borderColor: '#ddd',
     borderWidth: 1,
     borderRadius: 4,
     padding: 4,
   },
   descInput: {
     borderStyle: 'solid',
-    borderColor: '#ddd',
     borderWidth: 1,
     minHeight: 64,
     borderRadius: 4,

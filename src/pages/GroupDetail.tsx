@@ -5,6 +5,7 @@ import { RootStackParamList } from '../route/Router';
 import { EGroup } from '../entities/EGroup';
 import { globalContext } from '../context/globalContext';
 import { EAccount } from '../entities/EAccount';
+import { PrimaryButton } from '../components/Button';
 
 const styles = StyleSheet.create({
   container: {
@@ -14,7 +15,6 @@ const styles = StyleSheet.create({
     paddingBottom: 6,
     display: 'flex',
     justifyContent: 'flex-start',
-    backgroundColor: '#eee',
   },
   title: {
     fontSize: 32,
@@ -28,7 +28,7 @@ const styles = StyleSheet.create({
     opacity: 0.6,
     padding: 4,
     fontSize: 10,
-    color: '#000',
+    color: '#005485',
   },
   divider: {
     width: '100%',
@@ -43,7 +43,8 @@ const styles = StyleSheet.create({
     display: 'flex',
     gap: 4,
     flex: 1,
-    backgroundColor: '#ddd',
+    backgroundColor: '#fdfbe4',
+    marginBottom: 8,
   },
   addButton: {
     width: '100%',
@@ -128,10 +129,7 @@ export const GroupDetail: FC<NativeStackScreenProps<RootStackParamList, 'GroupDe
               <AccountItem key={i.id} account={i} toAccountDetail={toAccountDetail} />
             ))}
           </View>
-          <Pressable onPress={toAddItem} style={styles.addButton}>
-            <Text style={styles.addButtonText}>Add</Text>
-            {/* <AddIcon width={40} height={40} color="#3399CC" /> */}
-          </Pressable>
+          <PrimaryButton pressHandler={toAddItem} name="Add" />
           {/* <View style={styles.bottomContainer}>
           </View> */}
         </View>
@@ -144,17 +142,19 @@ const AccountStyles = StyleSheet.create({
   container: {
     display: 'flex',
     borderRadius: 6,
-    backgroundColor: '#fff',
+    backgroundColor: '#e5c185',
     padding: 8,
     gap: 4,
   },
   name: {
     fontSize: 14,
     fontWeight: 'bold',
+    color: '#005485',
   },
   account: {
     opacity: 0.5,
     fontSize: 10,
+    color: '#005485',
   },
 });
 

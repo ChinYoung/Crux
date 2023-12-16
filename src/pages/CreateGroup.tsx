@@ -16,6 +16,8 @@ import 'react-native-get-random-values';
 import { nanoid } from 'nanoid';
 import { EGroup } from '../entities/EGroup';
 import { PredefinedColors } from '../lib/Constants';
+import { LIGHT_DEFAULT_COLOR } from '../theme/color';
+import { PrimaryButton } from '../components/Button';
 
 const styles = StyleSheet.create({
   container: {
@@ -45,7 +47,7 @@ const styles = StyleSheet.create({
     borderRadius: 4,
   },
   confirmButton: {
-    backgroundColor: '#333399',
+    backgroundColor: LIGHT_DEFAULT_COLOR.button.primary,
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
@@ -124,11 +126,7 @@ export const CreateGroup: FC<NativeStackScreenProps<RootStackParamList, 'AddGrou
         </View>
       </View>
       {/* bottom buttons */}
-      <Pressable onPress={addTag}>
-        <View style={styles.confirmButton}>
-          <Text style={styles.confirmText}>confirm</Text>
-        </View>
-      </Pressable>
+      <PrimaryButton pressHandler={addTag} name="confirm" />
     </View>
   );
 };
