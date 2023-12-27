@@ -1,5 +1,5 @@
 import React, { FC, useCallback, useContext, useEffect, useState } from 'react';
-import { Pressable, SafeAreaView, StyleSheet, View } from 'react-native';
+import { KeyboardAvoidingView, Pressable, SafeAreaView, StyleSheet, TextInput, View } from 'react-native';
 import { globalContext } from '../context/globalContext';
 import { Capsule } from '../components/Capsule';
 import AddIcon from '../images/Add.svg';
@@ -13,11 +13,14 @@ const styles = StyleSheet.create({
     borderStyle: 'solid',
     borderWidth: 1,
   },
+  wrapper: {
+    flex: 1,
+  },
   root: {
+    flex: 1,
     display: 'flex',
     position: 'relative',
     width: '100%',
-    height: '100%',
     padding: 8,
     justifyContent: 'space-between',
   },
@@ -48,6 +51,16 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingBottom: 10,
   },
+  searchInput: {
+    padding: 6,
+    flex: 1,
+    borderWidth: 1,
+    borderStyle: 'solid',
+    borderRadius: 4,
+    display: 'flex',
+    flexDirection: 'row',
+    alignItems: 'center'
+  }
 });
 
 export const Home: FC<NativeStackScreenProps<RootStackParamList, 'Home'>> = ({ navigation }) => {
@@ -81,21 +94,24 @@ export const Home: FC<NativeStackScreenProps<RootStackParamList, 'Home'>> = ({ n
   }, [refresh, navigation]);
 
   return (
-    <SafeAreaView>
-      <View style={styles.root}>
-        <View style={styles.container}>
-          <View style={styles.contentWrapper}>
-            {allTag.map((_i) => (
-              <Capsule name={_i.name} key={_i.id} toDetail={() => toTagDetail(_i.tagId)} />
-            ))}
+    <SafeAreaView style={[styles.wrapper]}>
+      <KeyboardAvoidingView style={styles.wrapper} behavior='padding'>
+        <View style={[styles.root]}>
+          <View style={[styles.container]}>
+            <View style={styles.contentWrapper}>
+              {allTag.map((_i) => (
+                <Capsule name={_i.name} key={_i.id} toDetail={() => toTagDetail(_i.tagId)} />
+              ))}
+            </View>
+          </View>
+          <View style={styles.footer}>
+              <TextInput placeholder='search' style={styles.searchInput}></TextInput>
+            <Pressable onPress={toAddPage}>
+              <AddIcon width={40} height={40} color="#333399" />
+            </Pressable>
           </View>
         </View>
-        <View style={styles.footer}>
-          <Pressable onPress={toAddPage}>
-            <AddIcon width={40} height={40} color="#333399" />
-          </Pressable>
-        </View>
-      </View>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 };
