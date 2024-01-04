@@ -31,7 +31,12 @@ export class EAccount {
   @ManyToMany((_type) => EGroup, (tag) => tag.accountList)
   tags: EGroup[];
 
-  @OneToMany(() => EExtendItem, (extendedItem) => extendedItem.item, { cascade: true })
+  @OneToMany(() => EExtendItem, (extendedItem) => extendedItem.item, {
+    cascade: true,
+    onDelete: 'CASCADE',
+    createForeignKeyConstraints: false,
+    orphanedRowAction: 'delete',
+  })
   extendedItems: EExtendItem[];
 
   @Column(ColumnType.varchar)

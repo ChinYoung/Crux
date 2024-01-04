@@ -26,6 +26,9 @@ export class EExtendItem {
   @Column(ColumnType.text)
   content: string;
 
-  @ManyToOne(() => EAccount, (item) => item.extendedItems)
+  @ManyToOne(() => EAccount, (item) => item.extendedItems, {
+    onDelete: 'CASCADE',
+    createForeignKeyConstraints: false,
+  })
   item: EAccount;
 }
