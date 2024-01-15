@@ -1,11 +1,71 @@
 import React, { FC, useCallback, useContext, useEffect, useState } from 'react';
-import { KeyboardAvoidingView, Pressable, SafeAreaView, StyleSheet, TextInput, View } from 'react-native';
+import {
+  KeyboardAvoidingView,
+  Pressable,
+  SafeAreaView,
+  StyleSheet,
+  TextInput,
+  View,
+} from 'react-native';
 import { globalContext } from '../context/globalContext';
 import { Capsule } from '../components/Capsule';
 import AddIcon from '../images/Add.svg';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../route/Router';
 import { EGroup } from '../entities/EGroup';
+
+export const Home: FC<NativeStackScreenProps<RootStackParamList, 'Home'>> = ({ navigation }) => {
+  const [allTag, setAllTag] = useState<EGroup[]>([]);
+  const { dbConn } = useContext(globalContext);
+  const refresh = useCallback(async () => {
+    const res = await dbConn?.manager.find(EGroup, {
+      relations: {
+        accountList: true,
+      },
+    });
+    res && setAllTag(res);
+  }, [dbConn?.manager]);
+
+  const toAddPage = useCallback(() => {
+    navigation.navigate('AddGroup');
+  }, [navigation]);
+
+  const toTagDetail = useCallback(
+    (id: string) => {
+      // TODO: implement this
+      navigation.navigate('GroupDetail', { id });
+    },
+    [navigation],
+  );
+
+  useEffect(() => {
+    navigation.addListener('focus', refresh);
+    refresh();
+    return () => navigation.removeListener('focus', refresh);
+  }, [refresh, navigation]);
+
+  return (
+    <SafeAreaView style={[styles.wrapper]}>
+      <KeyboardAvoidingView style={styles.wrapper} behavior="padding">
+        <View style={[styles.root]}>
+          <View style={[styles.container]}>
+            <View style={styles.contentWrapper}>
+              {allTag.map((_i) => (
+                <Capsule name={_i.name} key={_i.id} toDetail={() => toTagDetail(_i.tagId)} />
+              ))}
+            </View>
+          </View>
+          <View style={styles.footer}>
+            <TextInput placeholder="search" style={styles.searchInput} />
+            <Pressable onPress={toAddPage}>
+              <AddIcon width={40} height={40} color="#333399" />
+            </Pressable>
+          </View>
+        </View>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
+  );
+};
 
 const styles = StyleSheet.create({
   debug: {
@@ -59,59 +119,6 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     display: 'flex',
     flexDirection: 'row',
-    alignItems: 'center'
-  }
+    alignItems: 'center',
+  },
 });
-
-export const Home: FC<NativeStackScreenProps<RootStackParamList, 'Home'>> = ({ navigation }) => {
-  const [allTag, setAllTag] = useState<EGroup[]>([]);
-  const { dbConn } = useContext(globalContext);
-  const refresh = useCallback(async () => {
-    const res = await dbConn?.manager.find(EGroup, {
-      relations: {
-        accountList: true,
-      },
-    });
-    res && setAllTag(res);
-  }, [dbConn?.manager]);
-
-  const toAddPage = useCallback(() => {
-    navigation.navigate('AddGroup');
-  }, [navigation]);
-
-  const toTagDetail = useCallback(
-    (id: string) => {
-      // TODO: implement this
-      navigation.navigate('GroupDetail', { id });
-    },
-    [navigation],
-  );
-
-  useEffect(() => {
-    navigation.addListener('focus', refresh);
-    refresh();
-    return () => navigation.removeListener('focus', refresh);
-  }, [refresh, navigation]);
-
-  return (
-    <SafeAreaView style={[styles.wrapper]}>
-      <KeyboardAvoidingView style={styles.wrapper} behavior='padding'>
-        <View style={[styles.root]}>
-          <View style={[styles.container]}>
-            <View style={styles.contentWrapper}>
-              {allTag.map((_i) => (
-                <Capsule name={_i.name} key={_i.id} toDetail={() => toTagDetail(_i.tagId)} />
-              ))}
-            </View>
-          </View>
-          <View style={styles.footer}>
-              <TextInput placeholder='search' style={styles.searchInput}></TextInput>
-            <Pressable onPress={toAddPage}>
-              <AddIcon width={40} height={40} color="#333399" />
-            </Pressable>
-          </View>
-        </View>
-      </KeyboardAvoidingView>
-    </SafeAreaView>
-  );
-};

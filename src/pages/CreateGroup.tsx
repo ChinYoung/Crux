@@ -18,12 +18,13 @@ import { EGroup } from '../entities/EGroup';
 import { PredefinedColors } from '../lib/Constants';
 import { LIGHT_DEFAULT_COLOR } from '../theme/color';
 import { PrimaryButton } from '../components/Button';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 const styles = StyleSheet.create({
   container: {
     display: 'flex',
     justifyContent: 'space-between',
-    padding: 8,
+    paddingHorizontal: 16,
     height: '100%',
   },
   inputs: {
@@ -103,31 +104,33 @@ export const CreateGroup: FC<NativeStackScreenProps<RootStackParamList, 'AddGrou
       });
   }, [dbConn, inputRef, navigation, newDesc, newName]);
   return (
-    <View style={styles.container}>
-      {/* top, inputs */}
-      <View style={styles.inputs}>
-        <View>
-          <Text style={styles.title}>name</Text>
-          <TextInput style={styles.nameInput} onChange={updateName} ref={inputRef} />
-        </View>
-        <View>
-          <Text style={styles.title}>description</Text>
-          <TextInput style={styles.descInput} multiline={true} onChange={updateDesc} />
-        </View>
-        {/* color picker */}
-        <View>
-          <Text style={styles.title}>Color</Text>
+    <SafeAreaView>
+      <View style={styles.container}>
+        {/* top, inputs */}
+        <View style={styles.inputs}>
           <View>
-            {PredefinedColors.dark.map((color) => (
-              <ColorButton isDark={true} color={color} onClick={onSelectColor} />
-            ))}
-            <Text>color</Text>
+            <Text style={styles.title}>name</Text>
+            <TextInput style={styles.nameInput} onChange={updateName} ref={inputRef} />
+          </View>
+          <View>
+            <Text style={styles.title}>description</Text>
+            <TextInput style={styles.descInput} multiline={true} onChange={updateDesc} />
+          </View>
+          {/* color picker */}
+          <View>
+            <Text style={styles.title}>Color</Text>
+            <View>
+              {PredefinedColors.dark.map((color) => (
+                <ColorButton key={color} isDark={true} color={color} onClick={onSelectColor} />
+              ))}
+              <Text>color</Text>
+            </View>
           </View>
         </View>
+        {/* bottom buttons */}
+        <PrimaryButton pressHandler={addTag} name="confirm" />
       </View>
-      {/* bottom buttons */}
-      <PrimaryButton pressHandler={addTag} name="confirm" />
-    </View>
+    </SafeAreaView>
   );
 };
 

@@ -6,6 +6,16 @@ export type TCapsuleProps = {
   toDetail: () => void;
 };
 
+export const Capsule: FC<TCapsuleProps> = ({ name, toDetail }) => {
+  return (
+    <Pressable onPress={toDetail}>
+      <View style={styles.container}>
+        <Text style={styles.name}>{name}</Text>
+      </View>
+    </Pressable>
+  );
+};
+
 const styles = StyleSheet.create({
   container: {
     backgroundColor: '#333399',
@@ -35,13 +45,3 @@ const styles = StyleSheet.create({
     borderColor: 'blue',
   },
 });
-
-export const Capsule: FC<TCapsuleProps> = ({ name, toDetail }) => {
-  return (
-    <Pressable onPress={toDetail}>
-      <View style={styles.container}>
-        <Text style={styles.name}>{name}</Text>
-      </View>
-    </Pressable>
-  );
-};
