@@ -6,6 +6,99 @@ import { EGroup } from '../entities/EGroup';
 import { globalContext } from '../context/globalContext';
 import { EAccount } from '../entities/EAccount';
 import { PrimaryButton } from '../components/Button';
+import { HeaderRightMenu } from '../components/HeaderRightMenu';
+
+export const GroupDetail: FC<NativeStackScreenProps<RootStackParamList, 'GroupDetail'>> = ({
+  route,
+  navigation,
+}) => {
+  const {
+    params: { id },
+  } = route;
+  const { dbConn } = useContext(globalContext);
+  const [tag, setTag] = useState<EGroup | null>(null);
+
+  const toAddItem = useCallback(() => {
+    if (!tag) {
+      return;
+    }
+    navigation.navigate('AddItem', { tagId: tag.tagId, tagName: tag.name });
+  }, [navigation, tag]);
+
+  const refresh = useCallback(() => {
+    dbConn
+      ?.getRepository(EGroup)
+      .findOne({ relations: { accountList: true }, where: { tagId: id } })
+      .then((res) => {
+        console.log('🚀 ~ file: GroupDetail.tsx:85 ~ .then ~ res:', res);
+        if (!res) {
+          return;
+        }
+        setTag(res);
+      });
+  }, [dbConn, id]);
+
+  const toAccountDetail = useCallback(
+    (accountId: string, name: string) => {
+      navigation.navigate('AccountDetail', { accountId, name });
+    },
+    [navigation],
+  );
+
+  useEffect(() => {
+    navigation.setOptions({
+      headerRight() {
+        return <HeaderRightMenu title="Menu" />;
+      },
+    });
+    navigation.addListener('focus', refresh);
+    refresh();
+    return () => navigation.removeListener('focus', refresh);
+  }, [refresh, navigation]);
+
+  useEffect(() => {
+    navigation.setOptions({
+      title: tag?.name,
+    });
+  }, [navigation, tag?.name]);
+
+  return (
+    <>
+      {tag ? (
+        <View style={styles.container}>
+          {/* <Text>{tag.tagId}</Text> */}
+          {/* <Text style={styles.title}>{tag.name}</Text> */}
+          <Text style={styles.descriptionContent}>{tag.desc}</Text>
+          {/* <View style={styles.divider} /> */}
+          <View style={styles.contentWrapper}>
+            {tag.accountList.map((i) => (
+              <AccountItem key={i.id} account={i} toAccountDetail={toAccountDetail} />
+            ))}
+          </View>
+          <PrimaryButton pressHandler={toAddItem} name="Add" />
+          {/* <View style={styles.bottomContainer}>
+          </View> */}
+        </View>
+      ) : null}
+    </>
+  );
+};
+
+const AccountItem: FC<{
+  account: EAccount;
+  toAccountDetail: (itemId: string, name: string) => void;
+}> = ({ account: { account, name, accountId }, toAccountDetail }) => {
+  return (
+    <Pressable onPress={() => toAccountDetail(accountId, name)}>
+      <View style={AccountStyles.container}>
+        <Text style={AccountStyles.name}>{name}</Text>
+        <Text numberOfLines={1} style={[AccountStyles.account]}>
+          {account}
+        </Text>
+      </View>
+    </Pressable>
+  );
+};
 
 const styles = StyleSheet.create({
   container: {
@@ -67,77 +160,6 @@ const styles = StyleSheet.create({
   },
 });
 
-export const GroupDetail: FC<NativeStackScreenProps<RootStackParamList, 'GroupDetail'>> = ({
-  route,
-  navigation,
-}) => {
-  const {
-    params: { id },
-  } = route;
-  const { dbConn } = useContext(globalContext);
-  const [tag, setTag] = useState<EGroup | null>(null);
-
-  const toAddItem = useCallback(() => {
-    if (!tag) {
-      return;
-    }
-    navigation.navigate('AddItem', { tagId: tag.tagId, tagName: tag.name });
-  }, [navigation, tag]);
-
-  const refresh = useCallback(() => {
-    dbConn
-      ?.getRepository(EGroup)
-      .findOne({ relations: { accountList: true }, where: { tagId: id } })
-      .then((res) => {
-        console.log('🚀 ~ file: GroupDetail.tsx:85 ~ .then ~ res:', res);
-        if (!res) {
-          return;
-        }
-        setTag(res);
-      });
-  }, [dbConn, id]);
-
-  const toAccountDetail = useCallback(
-    (accountId: string, name: string) => {
-      navigation.navigate('AccountDetail', { accountId, name });
-    },
-    [navigation],
-  );
-
-  useEffect(() => {
-    navigation.addListener('focus', refresh);
-    refresh();
-    return () => navigation.removeListener('focus', refresh);
-  }, [refresh, navigation]);
-
-  useEffect(() => {
-    navigation.setOptions({
-      title: tag?.name,
-    });
-  }, [navigation, tag?.name]);
-
-  return (
-    <>
-      {tag ? (
-        <View style={styles.container}>
-          {/* <Text>{tag.tagId}</Text> */}
-          {/* <Text style={styles.title}>{tag.name}</Text> */}
-          <Text style={styles.descriptionContent}>{tag.desc}</Text>
-          {/* <View style={styles.divider} /> */}
-          <View style={styles.contentWrapper}>
-            {tag.accountList.map((i) => (
-              <AccountItem key={i.id} account={i} toAccountDetail={toAccountDetail} />
-            ))}
-          </View>
-          <PrimaryButton pressHandler={toAddItem} name="Add" />
-          {/* <View style={styles.bottomContainer}>
-          </View> */}
-        </View>
-      ) : null}
-    </>
-  );
-};
-
 const AccountStyles = StyleSheet.create({
   container: {
     display: 'flex',
@@ -157,19 +179,3 @@ const AccountStyles = StyleSheet.create({
     color: '#005485',
   },
 });
-
-const AccountItem: FC<{
-  account: EAccount;
-  toAccountDetail: (itemId: string, name: string) => void;
-}> = ({ account: { account, name, accountId }, toAccountDetail }) => {
-  return (
-    <Pressable onPress={() => toAccountDetail(accountId, name)}>
-      <View style={AccountStyles.container}>
-        <Text style={AccountStyles.name}>{name}</Text>
-        <Text numberOfLines={1} style={[AccountStyles.account]}>
-          {account}
-        </Text>
-      </View>
-    </Pressable>
-  );
-};

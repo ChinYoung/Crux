@@ -18,6 +18,7 @@ import { GroupDetail } from './src/pages/GroupDetail';
 import { AddAccount } from './src/pages/AddAccount';
 import { AccountDetail } from './src/pages/AccountDetail';
 import { LIGHT_DEFAULT_COLOR } from './src/theme/color';
+import { View, Text } from 'react-native';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -43,7 +44,13 @@ function App(): JSX.Element {
           initialRouteName="Home"
           screenOptions={{ title: '', headerShadowVisible: false }}
         >
-          <Stack.Screen name="Home" component={Home} options={{ headerShown: false }} />
+          <Stack.Screen
+            name="Home"
+            component={Home}
+            options={{
+              headerShown: false,
+            }}
+          />
           <Stack.Screen
             name="AddGroup"
             component={CreateGroup}
