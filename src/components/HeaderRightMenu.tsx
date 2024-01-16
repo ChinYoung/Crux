@@ -1,6 +1,7 @@
 import { FC, useCallback, useState } from 'react';
 import { Pressable, StyleSheet } from 'react-native';
 import { Text, View } from 'react-native';
+import Animated, { useSharedValue } from 'react-native-reanimated';
 
 export type HeaderRightMenuProps = {
   title: string;
@@ -8,9 +9,12 @@ export type HeaderRightMenuProps = {
 
 export const HeaderRightMenu: FC<HeaderRightMenuProps> = ({ title }) => {
   const [isShowSubMenu, setIsShowSubMenu] = useState<boolean>(false);
+  const opacity = useSharedValue(0);
+
   const toggleSubMenu = useCallback(() => {
-    setIsShowSubMenu(!isShowSubMenu);
-  }, [isShowSubMenu]);
+    // setIsShowSubMenu(!isShowSubMenu);
+    opacity.value = opacity.value + 0.2;
+  }, [opacity]);
   return (
     <>
       <Pressable onPress={toggleSubMenu}>
@@ -18,15 +22,13 @@ export const HeaderRightMenu: FC<HeaderRightMenuProps> = ({ title }) => {
           <Text numberOfLines={1}>{title}</Text>
         </View>
       </Pressable>
-      {isShowSubMenu && (
-        <View style={[MenuStyles.subMenu, MenuStyles.debug]}>
-          <View>
-            <Text numberOfLines={1} style={{ flex: 1, textAlign: 'left' }}>
-              Sub Menu
-            </Text>
-          </View>
+      <Animated.View style={[{ opacity }, MenuStyles.subMenu, MenuStyles.debug]}>
+        <View>
+          <Text numberOfLines={1} style={{ flex: 1, textAlign: 'left' }}>
+            Sub Menu
+          </Text>
         </View>
-      )}
+      </Animated.View>
     </>
   );
 };
