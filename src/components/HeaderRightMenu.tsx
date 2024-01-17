@@ -1,7 +1,7 @@
 import { FC, useCallback, useState } from 'react';
 import { Pressable, StyleSheet } from 'react-native';
 import { Text, View } from 'react-native';
-import Animated, { useSharedValue } from 'react-native-reanimated';
+import Animated, { FadeInRight, FadeOutRight, Easing } from 'react-native-reanimated';
 
 export type HeaderRightMenuProps = {
   title: string;
@@ -9,26 +9,45 @@ export type HeaderRightMenuProps = {
 
 export const HeaderRightMenu: FC<HeaderRightMenuProps> = ({ title }) => {
   const [isShowSubMenu, setIsShowSubMenu] = useState<boolean>(false);
-  const opacity = useSharedValue(0);
 
   const toggleSubMenu = useCallback(() => {
-    // setIsShowSubMenu(!isShowSubMenu);
-    opacity.value = opacity.value + 0.2;
-  }, [opacity]);
+    setIsShowSubMenu(!isShowSubMenu);
+  }, [isShowSubMenu]);
   return (
     <>
       <Pressable onPress={toggleSubMenu}>
-        <View style={[MenuStyles.debug]}>
+        <View>
           <Text numberOfLines={1}>{title}</Text>
         </View>
       </Pressable>
-      <Animated.View style={[{ opacity }, MenuStyles.subMenu, MenuStyles.debug]}>
-        <View>
-          <Text numberOfLines={1} style={{ flex: 1, textAlign: 'left' }}>
-            Sub Menu
-          </Text>
-        </View>
-      </Animated.View>
+      {isShowSubMenu && (
+        <Animated.View
+          style={[MenuStyles.subMenu]}
+          entering={FadeInRight.easing(Easing.in(Easing.bounce))}
+          exiting={FadeOutRight}
+        >
+          <View>
+            <Text numberOfLines={1} style={{ flex: 1, textAlign: 'left' }}>
+              Sub Menu 1
+            </Text>
+            <Text numberOfLines={1} style={{ flex: 1, textAlign: 'left' }}>
+              Sub Menu 2
+            </Text>
+            <Text numberOfLines={1} style={{ flex: 1, textAlign: 'left' }}>
+              Sub Menu 3
+            </Text>
+            <Text numberOfLines={1} style={{ flex: 1, textAlign: 'left' }}>
+              Sub Menu 4
+            </Text>
+            <Text numberOfLines={1} style={{ flex: 1, textAlign: 'left' }}>
+              Sub Menu 5
+            </Text>
+            <Text numberOfLines={1} style={{ flex: 1, textAlign: 'left' }}>
+              Sub Menu 6
+            </Text>
+          </View>
+        </Animated.View>
+      )}
     </>
   );
 };

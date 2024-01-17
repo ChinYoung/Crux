@@ -119,7 +119,7 @@ export const CreateGroup: FC<NativeStackScreenProps<RootStackParamList, 'AddGrou
           <Text style={styles.title}>Color</Text>
           <View>
             {PredefinedColors.dark.map((color) => (
-              <ColorButton isDark={true} color={color} onClick={onSelectColor} />
+              <ColorButton key={color} isDark={true} color={color} onClick={onSelectColor} />
             ))}
             <Text>color</Text>
           </View>
