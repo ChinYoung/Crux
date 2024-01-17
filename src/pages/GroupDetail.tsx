@@ -1,6 +1,6 @@
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { FC, useCallback, useContext, useEffect, useState } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, SafeAreaView, StyleSheet, Text, View } from 'react-native';
 import { RootStackParamList } from '../route/Router';
 import { EGroup } from '../entities/EGroup';
 import { globalContext } from '../context/globalContext';
@@ -16,14 +16,14 @@ export const GroupDetail: FC<NativeStackScreenProps<RootStackParamList, 'GroupDe
     params: { id },
   } = route;
   const { dbConn } = useContext(globalContext);
-  const [tag, setTag] = useState<EGroup | null>(null);
+  const [group, setGroup] = useState<EGroup | null>(null);
 
   const toAddItem = useCallback(() => {
-    if (!tag) {
+    if (!group) {
       return;
     }
-    navigation.navigate('AddItem', { tagId: tag.tagId, tagName: tag.name });
-  }, [navigation, tag]);
+    navigation.navigate('AddItem', { tagId: group.tagId, tagName: group.name });
+  }, [navigation, group]);
 
   const refresh = useCallback(() => {
     dbConn
@@ -34,7 +34,7 @@ export const GroupDetail: FC<NativeStackScreenProps<RootStackParamList, 'GroupDe
         if (!res) {
           return;
         }
-        setTag(res);
+        setGroup(res);
       });
   }, [dbConn, id]);
 
@@ -58,27 +58,29 @@ export const GroupDetail: FC<NativeStackScreenProps<RootStackParamList, 'GroupDe
 
   useEffect(() => {
     navigation.setOptions({
-      title: tag?.name,
+      title: group?.name,
     });
-  }, [navigation, tag?.name]);
+  }, [navigation, group?.name]);
 
   return (
     <>
-      {tag ? (
-        <View style={styles.container}>
-          {/* <Text>{tag.tagId}</Text> */}
-          {/* <Text style={styles.title}>{tag.name}</Text> */}
-          <Text style={styles.descriptionContent}>{tag.desc}</Text>
-          {/* <View style={styles.divider} /> */}
-          <View style={styles.contentWrapper}>
-            {tag.accountList.map((i) => (
-              <AccountItem key={i.id} account={i} toAccountDetail={toAccountDetail} />
-            ))}
-          </View>
-          <PrimaryButton pressHandler={toAddItem} name="Add" />
-          {/* <View style={styles.bottomContainer}>
+      {group ? (
+        <SafeAreaView>
+          <View style={styles.container}>
+            {/* <Text>{tag.tagId}</Text> */}
+            {/* <Text style={styles.title}>{tag.name}</Text> */}
+            <Text style={styles.descriptionContent}>{group.desc}</Text>
+            {/* <View style={styles.divider} /> */}
+            <View style={styles.contentWrapper}>
+              {group.accountList.map((i) => (
+                <AccountItem key={i.id} account={i} toAccountDetail={toAccountDetail} />
+              ))}
+            </View>
+            <PrimaryButton pressHandler={toAddItem} name="Add" />
+            {/* <View style={styles.bottomContainer}>
           </View> */}
-        </View>
+          </View>
+        </SafeAreaView>
       ) : null}
     </>
   );
