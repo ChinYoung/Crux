@@ -4,6 +4,7 @@ import { DataSource } from 'typeorm/browser';
 import { Db } from '../lib/Db';
 import datasource from '../lib/datasource';
 import { ClickOutsideProvider } from 'react-native-click-outside';
+import { PortalProvider } from '@gorhom/portal';
 
 type TGlobalContext = {
   dbConn: DataSource | null;
@@ -35,7 +36,9 @@ export const GlobalContextProvider: FC<PropsWithChildren> = ({ children }) => {
 
   return (
     <globalContext.Provider value={{ dbConn, isLoading, loading }}>
-      <ClickOutsideProvider>{children}</ClickOutsideProvider>
+      <PortalProvider>
+        <ClickOutsideProvider>{children}</ClickOutsideProvider>
+      </PortalProvider>
     </globalContext.Provider>
   );
 };

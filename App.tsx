@@ -67,6 +67,7 @@ function App(): JSX.Element {
             name="GroupDetail"
             component={GroupDetail}
             options={{
+              headerTransparent: false,
               headerStyle: {
                 backgroundColor: LIGHT_DEFAULT_COLOR.background.primary,
               },

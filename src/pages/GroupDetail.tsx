@@ -7,6 +7,7 @@ import { globalContext } from '../context/globalContext';
 import { EAccount } from '../entities/EAccount';
 import { PrimaryButton } from '../components/Button';
 import { HeaderRightMenu } from '../components/HeaderRightMenu';
+import { PortalHost } from '@gorhom/portal';
 
 export const GroupDetail: FC<NativeStackScreenProps<RootStackParamList, 'GroupDetail'>> = ({
   route,
@@ -66,7 +67,8 @@ export const GroupDetail: FC<NativeStackScreenProps<RootStackParamList, 'GroupDe
     <>
       {group ? (
         <SafeAreaView>
-          <View style={styles.container}>
+          <View style={[styles.container]}>
+            <PortalHost name="subMenu" />
             {/* <Text>{tag.tagId}</Text> */}
             {/* <Text style={styles.title}>{tag.name}</Text> */}
             <Text style={styles.descriptionContent}>{group.desc}</Text>
@@ -103,7 +105,13 @@ const AccountItem: FC<{
 };
 
 const styles = StyleSheet.create({
+  debug: {
+    borderStyle: 'solid',
+    borderColor: 'blue',
+    borderWidth: 1,
+  },
   container: {
+    position: 'relative',
     width: '100%',
     height: '100%',
     paddingHorizontal: 16,
