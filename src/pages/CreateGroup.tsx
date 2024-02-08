@@ -8,6 +8,7 @@ import {
   TextInput,
   TextInputChangeEventData,
   View,
+  SafeAreaView,
 } from 'react-native';
 import { globalContext } from '../context/globalContext';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -18,7 +19,6 @@ import { EGroup } from '../entities/EGroup';
 import { PredefinedColors } from '../lib/Constants';
 import { LIGHT_DEFAULT_COLOR } from '../theme/color';
 import { PrimaryButton } from '../components/Button';
-import { SafeAreaView } from 'react-native-safe-area-context';
 
 const styles = StyleSheet.create({
   container: {
