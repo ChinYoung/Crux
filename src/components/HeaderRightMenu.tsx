@@ -1,5 +1,5 @@
-import { FC, createRef, useCallback, useState } from 'react';
-import { StyleSheet, TextInput } from 'react-native';
+import { FC, useCallback, useState } from 'react';
+import { StyleSheet } from 'react-native';
 import { View } from 'react-native';
 import Animated, { FadeInRight, FadeOutRight } from 'react-native-reanimated';
 import { LIGHT_DEFAULT_COLOR } from '../theme/color';
@@ -9,47 +9,35 @@ import { Portal } from '@gorhom/portal';
 
 export type HeaderRightMenuProps = {
   title: string;
+  menuItems: MenuConfig[];
   hideMenu?: () => void;
 };
 
-export const HeaderRightMenu: FC<HeaderRightMenuProps> = ({ title }) => {
+export const HeaderRightMenu: FC<HeaderRightMenuProps> = ({ title, menuItems }) => {
   const [isShowSubMenu, setIsShowSubMenu] = useState<boolean>(false);
-  const toggleSubMenu = useCallback(
-    (name = 'xxxx') => {
-      setIsShowSubMenu(!isShowSubMenu);
-      console.log(name, '------------------------');
-    },
-    [isShowSubMenu],
-  );
-  const clickOutSideRef = useClickOutside(toggleSubMenu);
+  const toggleSubMenu = useCallback(() => {
+    setIsShowSubMenu(!isShowSubMenu);
+  }, [isShowSubMenu]);
+  const clickOutSideRef = useClickOutside(() => isShowSubMenu && toggleSubMenu());
 
   return (
-    <>
-      <View>
-        <PrimaryButton name="Menu" pressHandler={() => toggleSubMenu('show')} />
-      </View>
+    <View ref={clickOutSideRef}>
+      <PrimaryButton name={title} pressHandler={() => toggleSubMenu('show')} />
       <Portal hostName="subMenu">
         {isShowSubMenu && (
           <View style={[MenuStyles.subMenu]}>
-            <Animated.View entering={FadeInRight} exiting={FadeOutRight.delay(200)}>
-              <SecondaryButton name="Sub menu 1" pressHandler={() => toggleSubMenu('sub menu 1')} />
-            </Animated.View>
-            <Animated.View entering={FadeInRight.delay(50)} exiting={FadeOutRight.delay(150)}>
-              <SecondaryButton name="Sub menu 1" pressHandler={() => toggleSubMenu('sub menu 2')} />
-            </Animated.View>
-            <Animated.View entering={FadeInRight.delay(100)} exiting={FadeOutRight.delay(100)}>
-              <SecondaryButton name="Sub menu 1" pressHandler={() => toggleSubMenu('sub menu 3')} />
-            </Animated.View>
-            <Animated.View entering={FadeInRight.delay(150)} exiting={FadeOutRight.delay(50)}>
-              <SecondaryButton name="Sub menu 1" pressHandler={() => toggleSubMenu('sub menu 4')} />
-            </Animated.View>
-            <Animated.View entering={FadeInRight.delay(200)} exiting={FadeOutRight}>
-              <SecondaryButton name="Sub menu 1" pressHandler={() => toggleSubMenu('sub menu 5')} />
-            </Animated.View>
+            {menuItems.map(({ handler, name }, index) => (
+              <Animated.View
+                entering={FadeInRight.delay((index + 1) * 50)}
+                exiting={FadeOutRight.delay(menuItems.length * 50 - index * 50)}
+              >
+                <SecondaryButton name={name} pressHandler={handler} />
+              </Animated.View>
+            ))}
           </View>
         )}
       </Portal>
-    </>
+    </View>
   );
 };
 

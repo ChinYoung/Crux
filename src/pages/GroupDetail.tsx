@@ -49,7 +49,25 @@ export const GroupDetail: FC<NativeStackScreenProps<RootStackParamList, 'GroupDe
   useEffect(() => {
     navigation.setOptions({
       headerRight() {
-        return <HeaderRightMenu title="Menu" />;
+        return (
+          <HeaderRightMenu
+            title="Menux"
+            menuItems={[
+              {
+                name: 'sub menu 1',
+                handler: () => console.log('sub menu 1'),
+              },
+              {
+                name: 'sub menu 2',
+                handler: () => console.log('sub menu 2'),
+              },
+              {
+                name: 'sub menu 3',
+                handler: () => console.log('sub menu 3'),
+              },
+            ]}
+          />
+        );
       },
     });
     navigation.addListener('focus', refresh);
@@ -62,6 +80,8 @@ export const GroupDetail: FC<NativeStackScreenProps<RootStackParamList, 'GroupDe
       title: group?.name,
     });
   }, [navigation, group?.name]);
+
+  console.log();
 
   return (
     <>

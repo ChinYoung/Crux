@@ -56,7 +56,6 @@ function App(): JSX.Element {
             component={CreateGroup}
             options={{
               title: 'Create A Group',
-
               headerStyle: {
                 backgroundColor: LIGHT_DEFAULT_COLOR.background.primary,
               },
