@@ -17,6 +17,7 @@ import 'react-native-get-random-values';
 import { nanoid } from 'nanoid';
 import { EAccount } from '../entities/EAccount';
 import { PrimaryButton } from '../components/Button';
+import { SafeWithHeaderKeyboardAvoidingView } from '../components/SafeWithHeaderKeyboardAvoidingView';
 
 export const AddAccount: FC<NativeStackScreenProps<RootStackParamList, 'AddItem'>> = ({
   navigation,
@@ -86,36 +87,38 @@ export const AddAccount: FC<NativeStackScreenProps<RootStackParamList, 'AddItem'
   }, [navigation, tagName]);
 
   return (
-    <View style={styles.container}>
-      <View style={styles.inputs}>
-        <View>
-          <Text>Name</Text>
-          <TextInput style={styles.input} onChange={updateName} ref={inputRef} />
+    <SafeWithHeaderKeyboardAvoidingView>
+      <View style={styles.container}>
+        <View style={styles.inputs}>
+          <View>
+            <Text>Name</Text>
+            <TextInput style={styles.input} onChange={updateName} ref={inputRef} />
+          </View>
+          <View>
+            <Text>Account</Text>
+            <TextInput style={styles.input} onChange={updateAccount} ref={inputRef} />
+          </View>
+          <View>
+            <Text>Password</Text>
+            <TextInput style={styles.input} onChange={updatePassword} ref={inputRef} />
+          </View>
+          <View>
+            <Text>Dscription</Text>
+            <TextInput style={styles.descInput} multiline={true} onChange={updateDesc} />
+          </View>
         </View>
-        <View>
-          <Text>Account</Text>
-          <TextInput style={styles.input} onChange={updateAccount} ref={inputRef} />
-        </View>
-        <View>
-          <Text>Password</Text>
-          <TextInput style={styles.input} onChange={updatePassword} ref={inputRef} />
-        </View>
-        <View>
-          <Text>Dscription</Text>
-          <TextInput style={styles.descInput} multiline={true} onChange={updateDesc} />
-        </View>
+        <PrimaryButton pressHandler={addItem} name="Confirm" />
       </View>
-      <PrimaryButton pressHandler={addItem} name="Confirm" />
-    </View>
+    </SafeWithHeaderKeyboardAvoidingView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
+    flex: 1,
     display: 'flex',
     justifyContent: 'space-between',
     padding: 8,
-    height: '100%',
   },
   inputs: {
     display: 'flex',

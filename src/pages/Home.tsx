@@ -1,9 +1,12 @@
 import React, { FC, useCallback, useContext, useEffect, useState } from 'react';
 import {
+  Button,
+  Keyboard,
   KeyboardAvoidingView,
   Pressable,
   SafeAreaView,
   StyleSheet,
+  Text,
   TextInput,
   View,
 } from 'react-native';
@@ -13,10 +16,27 @@ import AddIcon from '../images/Add.svg';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../route/Router';
 import { EGroup } from '../entities/EGroup';
+import { SafeWithHeaderKeyboardAvoidingView } from '../components/SafeWithHeaderKeyboardAvoidingView';
+import Animated, {
+  useAnimatedStyle,
+  useSharedValue,
+  withDelay,
+  withTiming,
+} from 'react-native-reanimated';
 
 export const Home: FC<NativeStackScreenProps<RootStackParamList, 'Home'>> = ({ navigation }) => {
-  const [allTag, setAllTag] = useState<EGroup[]>([]);
   const { dbConn } = useContext(globalContext);
+  const [allTag, setAllTag] = useState<EGroup[]>([]);
+
+  const percent = useSharedValue(0.15);
+
+  const width = useAnimatedStyle(
+    () => ({
+      width: withDelay(300, withTiming(`${percent.value * 100}%`)),
+    }),
+    [],
+  );
+
   const refresh = useCallback(async () => {
     const res = await dbConn?.manager.find(EGroup, {
       relations: {
@@ -38,6 +58,13 @@ export const Home: FC<NativeStackScreenProps<RootStackParamList, 'Home'>> = ({ n
     [navigation],
   );
 
+  const expandSearch = useCallback(() => {
+    percent.value = 0.85;
+  }, [percent]);
+  const foldSearch = useCallback(() => {
+    percent.value = 0.15;
+  }, [percent]);
+
   useEffect(() => {
     navigation.addListener('focus', refresh);
     refresh();
@@ -45,25 +72,34 @@ export const Home: FC<NativeStackScreenProps<RootStackParamList, 'Home'>> = ({ n
   }, [refresh, navigation]);
 
   return (
-    <SafeAreaView style={[styles.wrapper]}>
-      <KeyboardAvoidingView style={styles.wrapper} behavior="padding">
-        <View style={[styles.root]}>
-          <View style={[styles.container]}>
-            <View style={styles.contentWrapper}>
-              {allTag.map((_i) => (
-                <Capsule name={_i.name} key={_i.id} toDetail={() => toTagDetail(_i.tagId)} />
-              ))}
-            </View>
+    <SafeWithHeaderKeyboardAvoidingView>
+      <View style={[styles.root, styles.debug]}>
+        {/* content */}
+        <Pressable onPress={Keyboard.dismiss} style={[styles.container, styles.debug]}>
+          <View style={styles.contentWrapper}>
+            {allTag.map((_i) => (
+              <Capsule name={_i.name} key={_i.id} toDetail={() => toTagDetail(_i.tagId)} />
+            ))}
           </View>
-          <View style={styles.footer}>
-            <TextInput placeholder="search" style={styles.searchInput} />
-            <Pressable onPress={toAddPage}>
-              <AddIcon width={40} height={40} color="#333399" />
-            </Pressable>
-          </View>
+        </Pressable>
+        {/* footer */}
+        <View style={styles.footer}>
+          <Animated.View style={[width, styles.searchInputContainer]}>
+            <TextInput
+              placeholder="search"
+              style={[styles.searchInput]}
+              onFocus={expandSearch}
+              onBlur={foldSearch}
+            />
+          </Animated.View>
+          <Pressable onPress={toAddPage} style={[styles.createButton]}>
+            <Text>Create</Text>
+            {/* <Button title="Create" /> */}
+            {/* <AddIcon width={40} height={40} color="#333399" /> */}
+          </Pressable>
         </View>
-      </KeyboardAvoidingView>
-    </SafeAreaView>
+      </View>
+    </SafeWithHeaderKeyboardAvoidingView>
   );
 };
 
@@ -83,6 +119,9 @@ const styles = StyleSheet.create({
     width: '100%',
     padding: 8,
     justifyContent: 'space-between',
+  },
+  content: {
+    flex: 1,
   },
   container: {
     width: '100%',
@@ -110,15 +149,23 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     paddingBottom: 10,
+    marginTop: 8,
   },
-  searchInput: {
+  searchInputContainer: {
     padding: 6,
-    flex: 1,
     borderWidth: 1,
     borderStyle: 'solid',
     borderRadius: 4,
     display: 'flex',
-    flexDirection: 'row',
+    height: 40,
+  },
+  searchInput: {
+    flex: 1,
+  },
+  createButton: {
+    display: 'flex',
+    justifyContent: 'center',
     alignItems: 'center',
+    flex: 1,
   },
 });

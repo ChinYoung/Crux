@@ -8,6 +8,7 @@ import { EAccount } from '../entities/EAccount';
 import { PrimaryButton } from '../components/Button';
 import { HeaderRightMenu } from '../components/HeaderRightMenu';
 import { PortalHost } from '@gorhom/portal';
+import { SafeWithHeaderKeyboardAvoidingView } from '../components/SafeWithHeaderKeyboardAvoidingView';
 
 export const GroupDetail: FC<NativeStackScreenProps<RootStackParamList, 'GroupDetail'>> = ({
   route,
@@ -54,14 +55,17 @@ export const GroupDetail: FC<NativeStackScreenProps<RootStackParamList, 'GroupDe
             title="Menux"
             menuItems={[
               {
+                id: '1',
                 name: 'sub menu 1',
                 handler: () => console.log('sub menu 1'),
               },
               {
+                id: '2',
                 name: 'sub menu 2',
                 handler: () => console.log('sub menu 2'),
               },
               {
+                id: '3',
                 name: 'sub menu 3',
                 handler: () => console.log('sub menu 3'),
               },
@@ -86,7 +90,7 @@ export const GroupDetail: FC<NativeStackScreenProps<RootStackParamList, 'GroupDe
   return (
     <>
       {group ? (
-        <SafeAreaView>
+        <SafeWithHeaderKeyboardAvoidingView>
           <View style={[styles.container]}>
             <PortalHost name="subMenu" />
             {/* <Text>{tag.tagId}</Text> */}
@@ -102,7 +106,7 @@ export const GroupDetail: FC<NativeStackScreenProps<RootStackParamList, 'GroupDe
             {/* <View style={styles.bottomContainer}>
           </View> */}
           </View>
-        </SafeAreaView>
+        </SafeWithHeaderKeyboardAvoidingView>
       ) : null}
     </>
   );

@@ -26,8 +26,9 @@ export const HeaderRightMenu: FC<HeaderRightMenuProps> = ({ title, menuItems }) 
       <Portal hostName="subMenu">
         {isShowSubMenu && (
           <View style={[MenuStyles.subMenu]}>
-            {menuItems.map(({ handler, name }, index) => (
+            {menuItems.map(({ id, handler, name }, index) => (
               <Animated.View
+                key={id}
                 entering={FadeInRight.delay((index + 1) * 50)}
                 exiting={FadeOutRight.delay(menuItems.length * 50 - index * 50)}
               >

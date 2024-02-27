@@ -8,8 +8,6 @@ import {
   TextInput,
   TextInputChangeEventData,
   View,
-  SafeAreaView,
-  KeyboardAvoidingView,
 } from 'react-native';
 import { globalContext } from '../context/globalContext';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -20,24 +18,16 @@ import { EGroup } from '../entities/EGroup';
 import { PredefinedColors } from '../lib/Constants';
 import { LIGHT_DEFAULT_COLOR } from '../theme/color';
 import { PrimaryButton } from '../components/Button';
-import { HeaderHeightContext } from '@react-navigation/elements';
+import { SafeWithHeaderKeyboardAvoidingView } from '../components/SafeWithHeaderKeyboardAvoidingView';
 
 const styles = StyleSheet.create({
-  root: {
-    flex: 1,
-  },
-  container: {
-    flex: 1,
-  },
   content: {
     flex: 1,
     display: 'flex',
     position: 'relative',
     justifyContent: 'space-between',
     paddingHorizontal: 16,
-    borderStyle: 'solid',
-    borderColor: 'blue',
-    borderWidth: 1,
+    paddingBottom: 16,
   },
   inputs: {
     display: 'flex',
@@ -81,18 +71,6 @@ export const CreateGroup: FC<NativeStackScreenProps<RootStackParamList, 'AddGrou
   const [newDesc, setDesc] = useState<string>('');
   const { dbConn } = useContext(globalContext);
 
-  const useHeaderHeight = () => {
-    const height = useContext(HeaderHeightContext);
-
-    if (height === undefined) {
-      return 0;
-    }
-
-    return height;
-  };
-
-  console.log(useHeaderHeight(), '-----------');
-
   const updateName = useCallback((_e: NativeSyntheticEvent<TextInputChangeEventData>) => {
     setNewName(_e.nativeEvent.text);
   }, []);
@@ -127,36 +105,34 @@ export const CreateGroup: FC<NativeStackScreenProps<RootStackParamList, 'AddGrou
       });
   }, [dbConn, inputRef, navigation, newDesc, newName]);
   return (
-    <SafeAreaView style={styles.root}>
-      <KeyboardAvoidingView style={styles.container} behavior="padding" keyboardVerticalOffset={98}>
-        <View style={styles.content}>
-          {/* top, inputs */}
-          <View style={styles.inputs}>
+    <SafeWithHeaderKeyboardAvoidingView>
+      <View style={styles.content}>
+        {/* top, inputs */}
+        <View style={styles.inputs}>
+          <View>
+            <Text style={styles.title}>name</Text>
+            <TextInput style={styles.nameInput} onChange={updateName} ref={inputRef} />
+          </View>
+          <View>
+            <Text style={styles.title}>description</Text>
+            <TextInput style={styles.descInput} multiline={true} onChange={updateDesc} />
+          </View>
+          {/* color picker */}
+          <View style={{ flex: 1 }}>
+            <Text style={styles.title}>Color</Text>
             <View>
-              <Text style={styles.title}>name</Text>
-              <TextInput style={styles.nameInput} onChange={updateName} ref={inputRef} />
-            </View>
-            <View>
-              <Text style={styles.title}>description</Text>
-              <TextInput style={styles.descInput} multiline={true} onChange={updateDesc} />
-            </View>
-            {/* color picker */}
-            <View style={{ flex: 1 }}>
-              <Text style={styles.title}>Color</Text>
-              <View>
-                {PredefinedColors.dark.map((color) => (
-                  <ColorButton key={color} isDark={true} color={color} onClick={onSelectColor} />
-                ))}
-                <Text>color</Text>
-              </View>
+              {PredefinedColors.dark.map((color) => (
+                <ColorButton key={color} isDark={true} color={color} onClick={onSelectColor} />
+              ))}
+              <Text>color</Text>
             </View>
           </View>
-          {/* bottom buttons */}
-          <TextInput style={styles.descInput} onChange={updateDesc} />
-          {/* <PrimaryButton pressHandler={addTag} name="confirm" /> */}
         </View>
-      </KeyboardAvoidingView>
-    </SafeAreaView>
+        {/* bottom buttons */}
+        {/* <TextInput style={styles.nameInput} onChange={updateName} ref={inputRef} /> */}
+        <PrimaryButton pressHandler={addTag} name="confirm" />
+      </View>
+    </SafeWithHeaderKeyboardAvoidingView>
   );
 };
 

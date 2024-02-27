@@ -49,14 +49,21 @@ const BaseButton: FC<{
   pressHandler: () => void;
 }> = ({ pressHandler, name, color, textColor = '#fff' }) => {
   const styles = StyleSheet.create({
-    confirmButton: {
+    pressed: {
       backgroundColor: color,
+      opacity: 0.5,
+      borderRadius: 8,
+    },
+    notPressed: {
+      backgroundColor: color,
+      borderRadius: 8,
+    },
+    confirmButton: {
       display: 'flex',
       justifyContent: 'center',
       alignItems: 'center',
       paddingHorizontal: 16,
       paddingVertical: 8,
-      borderRadius: 8,
     },
     confirmText: {
       color: textColor,
@@ -67,7 +74,11 @@ const BaseButton: FC<{
     console.log('-------------');
   }, []);
   return (
-    <Pressable onPress={pressHandler} onHoverOut={hoverOutHandler}>
+    <Pressable
+      onPress={pressHandler}
+      onHoverOut={hoverOutHandler}
+      style={({ pressed }) => (pressed ? styles.pressed : styles.notPressed)}
+    >
       <View style={styles.confirmButton}>
         <Text style={styles.confirmText}>{name}</Text>
       </View>
