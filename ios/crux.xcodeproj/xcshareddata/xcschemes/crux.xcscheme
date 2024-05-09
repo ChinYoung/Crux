@@ -15,9 +15,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "13B07F861A680F5B00A75B9A"
-               BuildableName = "checklisty072.app"
-               BlueprintName = "checklisty072"
-               ReferencedContainer = "container:checklisty072.xcodeproj">
+               BuildableName = "crux.app"
+               BlueprintName = "crux"
+               ReferencedContainer = "container:crux.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -33,9 +33,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "00E356ED1AD99517003FC87E"
-               BuildableName = "checklisty072Tests.xctest"
-               BlueprintName = "checklisty072Tests"
-               ReferencedContainer = "container:checklisty072.xcodeproj">
+               BuildableName = "cruxTests.xctest"
+               BlueprintName = "cruxTests"
+               ReferencedContainer = "container:crux.xcodeproj">
             </BuildableReference>
          </TestableReference>
       </Testables>
@@ -55,9 +55,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "13B07F861A680F5B00A75B9A"
-            BuildableName = "checklisty072.app"
-            BlueprintName = "checklisty072"
-            ReferencedContainer = "container:checklisty072.xcodeproj">
+            BuildableName = "crux.app"
+            BlueprintName = "crux"
+            ReferencedContainer = "container:crux.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </LaunchAction>
@@ -72,9 +72,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "13B07F861A680F5B00A75B9A"
-            BuildableName = "checklisty072.app"
-            BlueprintName = "checklisty072"
-            ReferencedContainer = "container:checklisty072.xcodeproj">
+            BuildableName = "crux.app"
+            BlueprintName = "crux"
+            ReferencedContainer = "container:crux.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>
