@@ -19,6 +19,7 @@ import { PredefinedColors } from '../lib/Constants';
 import { LIGHT_DEFAULT_COLOR } from '../theme/color';
 import { PrimaryButton } from '../components/Button';
 import { SafeWithHeaderKeyboardAvoidingView } from '../components/SafeWithHeaderKeyboardAvoidingView';
+import { CustomInput } from '../components/CustomInput';
 
 const styles = StyleSheet.create({
   content: {
@@ -35,18 +36,6 @@ const styles = StyleSheet.create({
   },
   title: {
     color: '#000',
-  },
-  nameInput: {
-    borderStyle: 'solid',
-    borderColor: '#ccc',
-    borderWidth: 1,
-    borderRadius: 4,
-  },
-  descInput: {
-    borderStyle: 'solid',
-    borderColor: '#ccc',
-    borderWidth: 1,
-    borderRadius: 4,
   },
   confirmButton: {
     backgroundColor: LIGHT_DEFAULT_COLOR.button.primary,
@@ -71,11 +60,11 @@ export const CreateGroup: FC<NativeStackScreenProps<RootStackParamList, 'AddGrou
   const [newDesc, setDesc] = useState<string>('');
   const { dbConn } = useContext(globalContext);
 
-  const updateName = useCallback((_e: NativeSyntheticEvent<TextInputChangeEventData>) => {
-    setNewName(_e.nativeEvent.text);
+  const updateName = useCallback((val: string) => {
+    setNewName(val);
   }, []);
-  const updateDesc = useCallback((_e: NativeSyntheticEvent<TextInputChangeEventData>) => {
-    setDesc(_e.nativeEvent.text);
+  const updateDesc = useCallback((val: string) => {
+    setDesc(val);
   }, []);
 
   const onSelectColor = useCallback((color: string) => {
@@ -111,11 +100,11 @@ export const CreateGroup: FC<NativeStackScreenProps<RootStackParamList, 'AddGrou
         <View style={styles.inputs}>
           <View>
             <Text style={styles.title}>name</Text>
-            <TextInput style={styles.nameInput} onChange={updateName} ref={inputRef} />
+            <CustomInput multiple={false} onChange={updateName} />
           </View>
           <View>
             <Text style={styles.title}>description</Text>
-            <TextInput style={styles.descInput} multiline={true} onChange={updateDesc} />
+            <CustomInput multiple={true} onChange={updateDesc} />
           </View>
           {/* color picker */}
           <View style={{ flex: 1 }}>
@@ -130,7 +119,9 @@ export const CreateGroup: FC<NativeStackScreenProps<RootStackParamList, 'AddGrou
         </View>
         {/* bottom buttons */}
         {/* <TextInput style={styles.nameInput} onChange={updateName} ref={inputRef} /> */}
-        <PrimaryButton pressHandler={addTag} name="confirm" />
+        <View style={{ width: '100%' }}>
+          <PrimaryButton pressHandler={addTag} name="confirm" />
+        </View>
       </View>
     </SafeWithHeaderKeyboardAvoidingView>
   );

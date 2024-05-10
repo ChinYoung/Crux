@@ -18,6 +18,7 @@ import { nanoid } from 'nanoid';
 import { EAccount } from '../entities/EAccount';
 import { PrimaryButton } from '../components/Button';
 import { SafeWithHeaderKeyboardAvoidingView } from '../components/SafeWithHeaderKeyboardAvoidingView';
+import { CustomInput } from '../components/CustomInput';
 
 export const AddAccount: FC<NativeStackScreenProps<RootStackParamList, 'AddItem'>> = ({
   navigation,
@@ -32,17 +33,17 @@ export const AddAccount: FC<NativeStackScreenProps<RootStackParamList, 'AddItem'
   const [password, setPassword] = useState<string>('');
   const [newDesc, setDesc] = useState<string>('');
 
-  const updateAccount = useCallback((_e: NativeSyntheticEvent<TextInputChangeEventData>) => {
-    setAccount(_e.nativeEvent.text);
+  const updateAccount = useCallback((val: string) => {
+    setAccount(val);
   }, []);
-  const updateName = useCallback((_e: NativeSyntheticEvent<TextInputChangeEventData>) => {
-    setNewName(_e.nativeEvent.text);
+  const updateName = useCallback((val: string) => {
+    setNewName(val);
   }, []);
-  const updatePassword = useCallback((_e: NativeSyntheticEvent<TextInputChangeEventData>) => {
-    setPassword(_e.nativeEvent.text);
+  const updatePassword = useCallback((val: string) => {
+    setPassword(val);
   }, []);
-  const updateDesc = useCallback((_e: NativeSyntheticEvent<TextInputChangeEventData>) => {
-    setDesc(_e.nativeEvent.text);
+  const updateDesc = useCallback((val: string) => {
+    setDesc(val);
   }, []);
 
   const addItem = useCallback(async () => {
@@ -92,19 +93,19 @@ export const AddAccount: FC<NativeStackScreenProps<RootStackParamList, 'AddItem'
         <View style={styles.inputs}>
           <View>
             <Text>Name</Text>
-            <TextInput style={styles.input} onChange={updateName} ref={inputRef} />
+            <CustomInput multiple={false} onChange={updateName} />
           </View>
           <View>
             <Text>Account</Text>
-            <TextInput style={styles.input} onChange={updateAccount} ref={inputRef} />
+            <CustomInput multiple={false} onChange={updateAccount} />
           </View>
           <View>
             <Text>Password</Text>
-            <TextInput style={styles.input} onChange={updatePassword} ref={inputRef} />
+            <CustomInput multiple={false} onChange={updatePassword} />
           </View>
           <View>
             <Text>Dscription</Text>
-            <TextInput style={styles.descInput} multiline={true} onChange={updateDesc} />
+            <CustomInput multiple={true} onChange={updateDesc} />
           </View>
         </View>
         <PrimaryButton pressHandler={addItem} name="Confirm" />

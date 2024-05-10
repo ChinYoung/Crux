@@ -148,9 +148,15 @@ export const AccountDetail: FC<NativeStackScreenProps<RootStackParamList, 'Accou
           </View>
         ) : (
           <View style={styles.addExtentdButtonContainer}>
+            <View style={{ display: 'flex', flexDirection: 'row', gap: 4 }}>
+              <View style={{ flex: 1 }}>
+                <PrimaryButton pressHandler={confirmToDelete} name="Delete" />
+              </View>
+              <View style={{ flex: 1 }}>
+                <PrimaryButton pressHandler={showAddExtendedItem} name="Add" />
+              </View>
+            </View>
             <PrimaryButton pressHandler={showAddExtendedItem} name="Add to favorite" />
-            <PrimaryButton pressHandler={showAddExtendedItem} name="Add" />
-            <PrimaryButton pressHandler={confirmToDelete} name="Delete" />
           </View>
         )}
         {/* <View style={{ flex: 1, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>

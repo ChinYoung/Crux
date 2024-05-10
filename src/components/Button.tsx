@@ -1,4 +1,4 @@
-import { FC, useCallback } from 'react';
+import { FC, useCallback, useMemo } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { LIGHT_DEFAULT_COLOR } from '../theme/color';
 
@@ -53,17 +53,19 @@ const BaseButton: FC<{
       backgroundColor: color,
       opacity: 0.5,
       borderRadius: 8,
+      paddingHorizontal: 16,
+      paddingVertical: 8,
     },
     notPressed: {
       backgroundColor: color,
       borderRadius: 8,
+      paddingHorizontal: 16,
+      paddingVertical: 8,
     },
     confirmButton: {
       display: 'flex',
       justifyContent: 'center',
       alignItems: 'center',
-      paddingHorizontal: 16,
-      paddingVertical: 8,
     },
     confirmText: {
       color: textColor,
@@ -77,10 +79,12 @@ const BaseButton: FC<{
     <Pressable
       onPress={pressHandler}
       onHoverOut={hoverOutHandler}
-      style={({ pressed }) => (pressed ? styles.pressed : styles.notPressed)}
+      style={({ pressed }) => (pressed ? [styles.pressed] : [styles.notPressed])}
     >
-      <View style={styles.confirmButton}>
-        <Text style={styles.confirmText}>{name}</Text>
+      <View style={[styles.confirmButton]}>
+        <Text style={styles.confirmText} numberOfLines={1}>
+          {name}
+        </Text>
       </View>
     </Pressable>
   );

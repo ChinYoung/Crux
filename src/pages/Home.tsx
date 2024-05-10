@@ -23,16 +23,22 @@ import Animated, {
   withDelay,
   withTiming,
 } from 'react-native-reanimated';
+import { PrimaryButton } from '../components/Button';
 
 export const Home: FC<NativeStackScreenProps<RootStackParamList, 'Home'>> = ({ navigation }) => {
   const { dbConn } = useContext(globalContext);
   const [allTag, setAllTag] = useState<EGroup[]>([]);
 
-  const percent = useSharedValue(0.15);
+  const INIT_PERCENT = 0.2;
+  const EXPAND_PERCENT = 0.7;
+
+  const percent = useSharedValue(INIT_PERCENT);
+  const borderRadius = useSharedValue<number>(4);
 
   const width = useAnimatedStyle(
     () => ({
       width: withDelay(300, withTiming(`${percent.value * 100}%`)),
+      borderRadius: withDelay(300, withTiming(borderRadius.value)),
     }),
     [],
   );
@@ -59,11 +65,13 @@ export const Home: FC<NativeStackScreenProps<RootStackParamList, 'Home'>> = ({ n
   );
 
   const expandSearch = useCallback(() => {
-    percent.value = 0.85;
-  }, [percent]);
+    percent.value = EXPAND_PERCENT;
+    borderRadius.value = 999;
+  }, [percent, borderRadius]);
   const foldSearch = useCallback(() => {
-    percent.value = 0.15;
-  }, [percent]);
+    percent.value = INIT_PERCENT;
+    borderRadius.value = 4;
+  }, [borderRadius, percent]);
 
   useEffect(() => {
     navigation.addListener('focus', refresh);
@@ -92,11 +100,9 @@ export const Home: FC<NativeStackScreenProps<RootStackParamList, 'Home'>> = ({ n
               onBlur={foldSearch}
             />
           </Animated.View>
-          <Pressable onPress={toAddPage} style={[styles.createButton]}>
-            <Text>Create</Text>
-            {/* <Button title="Create" /> */}
-            {/* <AddIcon width={40} height={40} color="#333399" /> */}
-          </Pressable>
+          <View style={{ flex: 1 }}>
+            <PrimaryButton pressHandler={toAddPage} name="Create" />
+          </View>
         </View>
       </View>
     </SafeWithHeaderKeyboardAvoidingView>
@@ -145,17 +151,18 @@ const styles = StyleSheet.create({
     width: '100%',
     left: 0,
     display: 'flex',
+    gap: 8,
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
     paddingBottom: 10,
+    paddingVertical: 8,
     marginTop: 8,
   },
   searchInputContainer: {
     padding: 6,
     borderWidth: 1,
     borderStyle: 'solid',
-    borderRadius: 4,
     display: 'flex',
     height: 40,
   },

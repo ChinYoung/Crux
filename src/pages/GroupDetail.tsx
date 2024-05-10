@@ -102,7 +102,7 @@ export const GroupDetail: FC<NativeStackScreenProps<RootStackParamList, 'GroupDe
                 <AccountItem key={i.id} account={i} toAccountDetail={toAccountDetail} />
               ))}
             </View>
-            <PrimaryButton pressHandler={toAddItem} name="Add" />
+            <PrimaryButton pressHandler={toAddItem} name="Create" />
             {/* <View style={styles.bottomContainer}>
           </View> */}
           </View>
@@ -139,6 +139,7 @@ const styles = StyleSheet.create({
     width: '100%',
     height: '100%',
     paddingHorizontal: 16,
+    paddingBottom: 16,
     display: 'flex',
     justifyContent: 'flex-start',
   },
