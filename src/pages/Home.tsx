@@ -1,4 +1,4 @@
-import React, { FC, useCallback, useContext, useEffect, useState } from 'react';
+import React, { FC, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import {
   Button,
   Keyboard,
@@ -12,37 +12,48 @@ import {
 } from 'react-native';
 import { globalContext } from '../context/globalContext';
 import { Capsule } from '../components/Capsule';
-import AddIcon from '../images/Add.svg';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../route/Router';
 import { EGroup } from '../entities/EGroup';
 import { SafeWithHeaderKeyboardAvoidingView } from '../components/SafeWithHeaderKeyboardAvoidingView';
 import Animated, {
+  runOnJS,
   useAnimatedStyle,
+  useFrameCallback,
   useSharedValue,
   withDelay,
   withTiming,
 } from 'react-native-reanimated';
 import { PrimaryButton } from '../components/Button';
+import { SearchInput } from '../components/SearchInput';
 
 export const Home: FC<NativeStackScreenProps<RootStackParamList, 'Home'>> = ({ navigation }) => {
   const { dbConn } = useContext(globalContext);
   const [allTag, setAllTag] = useState<EGroup[]>([]);
+  const [isExpanded, setIsExpanded] = useState<boolean>(false);
 
-  const INIT_PERCENT = 0.2;
-  const EXPAND_PERCENT = 0.7;
+  const searchPercent = useSharedValue(0.1);
 
-  const percent = useSharedValue(INIT_PERCENT);
-  const borderRadius = useSharedValue<number>(4);
+  const updateExpandedVal = useCallback(() => {
+    setIsExpanded(searchPercent.value === 0.7);
+  }, [searchPercent]);
 
-  const width = useAnimatedStyle(
+  const animatedSearchStyle = useAnimatedStyle(
     () => ({
-      width: withDelay(300, withTiming(`${percent.value * 100}%`)),
-      borderRadius: withDelay(300, withTiming(borderRadius.value)),
+      flex: withTiming(searchPercent.value, {}, () => {
+        runOnJS(updateExpandedVal)();
+      }),
+      display: 'flex',
     }),
     [],
   );
-
+  const animatedButtonStyle = useAnimatedStyle(
+    () => ({
+      flex: withTiming(1 - searchPercent.value),
+      display: 'flex',
+    }),
+    [],
+  );
   const refresh = useCallback(async () => {
     const res = await dbConn?.manager.find(EGroup, {
       relations: {
@@ -64,20 +75,21 @@ export const Home: FC<NativeStackScreenProps<RootStackParamList, 'Home'>> = ({ n
     [navigation],
   );
 
-  const expandSearch = useCallback(() => {
-    percent.value = EXPAND_PERCENT;
-    borderRadius.value = 999;
-  }, [percent, borderRadius]);
-  const foldSearch = useCallback(() => {
-    percent.value = INIT_PERCENT;
-    borderRadius.value = 4;
-  }, [borderRadius, percent]);
-
   useEffect(() => {
     navigation.addListener('focus', refresh);
     refresh();
     return () => navigation.removeListener('focus', refresh);
   }, [refresh, navigation]);
+
+  const expandToSearch = useCallback(() => {
+    searchPercent.value = 0.7;
+    setIsExpanded(true);
+  }, [searchPercent]);
+
+  const foldSearch = useCallback(() => {
+    searchPercent.value = 0.1;
+    // setIsExpanded(false);
+  }, [searchPercent]);
 
   return (
     <SafeWithHeaderKeyboardAvoidingView>
@@ -91,18 +103,13 @@ export const Home: FC<NativeStackScreenProps<RootStackParamList, 'Home'>> = ({ n
           </View>
         </Pressable>
         {/* footer */}
-        <View style={styles.footer}>
-          <Animated.View style={[width, styles.searchInputContainer]}>
-            <TextInput
-              placeholder="search"
-              style={[styles.searchInput]}
-              onFocus={expandSearch}
-              onBlur={foldSearch}
-            />
+        <View style={[styles.footer]}>
+          <Animated.View style={[animatedSearchStyle]}>
+            <SearchInput onFocus={expandToSearch} onFold={foldSearch} isExpanded={isExpanded} />
           </Animated.View>
-          <View style={{ flex: 1 }}>
+          <Animated.View style={[animatedButtonStyle]}>
             <PrimaryButton pressHandler={toAddPage} name="Create" />
-          </View>
+          </Animated.View>
         </View>
       </View>
     </SafeWithHeaderKeyboardAvoidingView>
