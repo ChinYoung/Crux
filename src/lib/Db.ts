@@ -16,10 +16,14 @@ export class Db {
     if (Db.instance) {
       return;
     }
-    Db.instance = new Db(ds);
-    await Db.conn.initialize();
-    // TODO: remember to set dropBeforeSync to false
-    const dropBeforeSync = true;
-    await Db.conn.synchronize(dropBeforeSync);
+    try {
+      Db.instance = new Db(ds);
+      await Db.conn.initialize();
+      // TODO: remember to set dropBeforeSync to false
+      const dropBeforeSync = true;
+      await Db.conn.synchronize(dropBeforeSync);
+    } catch (err) {
+      console.log('🚀 ~ Db ~ init ~ err:', err);
+    }
   }
 }

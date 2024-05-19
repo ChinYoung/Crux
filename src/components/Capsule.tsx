@@ -1,16 +1,27 @@
 import { FC } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { EGroup } from '../entities/EGroup';
+import { PredefinedColorList } from '../lib/Constants';
 
 export type TCapsuleProps = {
-  name: string;
+  group: EGroup;
   toDetail: () => void;
 };
 
-export const Capsule: FC<TCapsuleProps> = ({ name, toDetail }) => {
+export const Capsule: FC<TCapsuleProps> = ({ group, toDetail }) => {
+  const color =
+    [PredefinedColorList.dark, PredefinedColorList.light]
+      .flat()
+      .find((c) => c.id === group.backgroundColor) || PredefinedColorList.dark[0];
+  const dynamicStyles = StyleSheet.create({
+    container: {
+      backgroundColor: color?.backgroundColor,
+    },
+  });
   return (
     <Pressable onPress={toDetail}>
-      <View style={styles.container}>
-        <Text style={styles.name}>{name}</Text>
+      <View style={[styles.container, dynamicStyles.container]}>
+        <Text style={styles.name}>{group.name}</Text>
       </View>
     </Pressable>
   );

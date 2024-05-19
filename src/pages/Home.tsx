@@ -29,7 +29,7 @@ import { SearchInput } from '../components/SearchInput';
 
 export const Home: FC<NativeStackScreenProps<RootStackParamList, 'Home'>> = ({ navigation }) => {
   const { dbConn } = useContext(globalContext);
-  const [allTag, setAllTag] = useState<EGroup[]>([]);
+  const [allGroups, setAllGroups] = useState<EGroup[]>([]);
   const [isExpanded, setIsExpanded] = useState<boolean>(false);
 
   const searchPercent = useSharedValue(0.1);
@@ -60,7 +60,7 @@ export const Home: FC<NativeStackScreenProps<RootStackParamList, 'Home'>> = ({ n
         accountList: true,
       },
     });
-    res && setAllTag(res);
+    res && setAllGroups(res);
   }, [dbConn?.manager]);
 
   const toAddPage = useCallback(() => {
@@ -93,12 +93,12 @@ export const Home: FC<NativeStackScreenProps<RootStackParamList, 'Home'>> = ({ n
 
   return (
     <SafeWithHeaderKeyboardAvoidingView>
-      <View style={[styles.root, styles.debug]}>
+      <View style={[styles.root]}>
         {/* content */}
-        <Pressable onPress={Keyboard.dismiss} style={[styles.container, styles.debug]}>
+        <Pressable onPress={Keyboard.dismiss} style={[styles.container]}>
           <View style={styles.contentWrapper}>
-            {allTag.map((_i) => (
-              <Capsule name={_i.name} key={_i.id} toDetail={() => toTagDetail(_i.tagId)} />
+            {allGroups.map((_i) => (
+              <Capsule group={_i} key={_i.id} toDetail={() => toTagDetail(_i.tagId)} />
             ))}
           </View>
         </Pressable>
@@ -117,11 +117,6 @@ export const Home: FC<NativeStackScreenProps<RootStackParamList, 'Home'>> = ({ n
 };
 
 const styles = StyleSheet.create({
-  debug: {
-    borderColor: 'blue',
-    borderStyle: 'solid',
-    borderWidth: 1,
-  },
   wrapper: {
     flex: 1,
   },

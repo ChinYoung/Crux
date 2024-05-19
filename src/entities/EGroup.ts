@@ -18,6 +18,9 @@ export class EGroup {
   @Column(ColumnType.text, { nullable: true })
   desc: string;
 
+  @Column(ColumnType.text)
+  backgroundColor: string;
+
   @Column(ColumnType.varchar)
   tagId: string;
 

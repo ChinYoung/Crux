@@ -1,4 +1,12 @@
-import { FC, useCallback, useState } from 'react';
+import {
+  FC,
+  ForwardRefRenderFunction,
+  Ref,
+  RefObject,
+  forwardRef,
+  useCallback,
+  useState,
+} from 'react';
 import {
   NativeSyntheticEvent,
   StyleSheet,
@@ -29,10 +37,10 @@ const styles = StyleSheet.create({
     borderWidth: 2,
   },
 });
-export const CustomInput: FC<{ multiple: boolean; onChange: (val: string) => void }> = ({
-  onChange,
-  multiple,
-}) => {
+const CustomInputComponent: ForwardRefRenderFunction<
+  TextInput,
+  { multiple: boolean; onChange: (val: string) => void }
+> = ({ onChange, multiple }, ref) => {
   const [isActivated, setIsActivated] = useState(false);
   const onChangeHandler = useCallback(
     (_e: NativeSyntheticEvent<TextInputChangeEventData>) => {
@@ -55,8 +63,10 @@ export const CustomInput: FC<{ multiple: boolean; onChange: (val: string) => voi
       ]}
     >
       <TextInput
+        ref={ref}
         style={styles.input}
         multiline={multiple}
+        autoCapitalize="none"
         onChange={onChangeHandler}
         onFocus={activate}
         onBlur={deactivate}
@@ -64,3 +74,5 @@ export const CustomInput: FC<{ multiple: boolean; onChange: (val: string) => voi
     </View>
   );
 };
+
+export const CustomInput = forwardRef(CustomInputComponent);

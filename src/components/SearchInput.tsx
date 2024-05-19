@@ -2,16 +2,14 @@ import { FC, createRef, useCallback, useEffect, useState } from 'react';
 import { Pressable, StyleSheet, TextInput, View } from 'react-native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faSearch } from '@fortawesome/free-solid-svg-icons/faSearch';
+import { GlobalStyles } from '../global/styles';
 
 const styles = StyleSheet.create({
-  debug: {
-    borderColor: 'blue',
-    borderStyle: 'solid',
-    borderWidth: 1,
-  },
   searchInputContainer: {
     borderRadius: 5,
     borderStyle: 'solid',
+    borderWidth: 1,
+    borderColor: 'blue',
     display: 'flex',
     height: 40,
     justifyContent: 'center',

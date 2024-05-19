@@ -1,21 +1,12 @@
-import { FC, createRef, useCallback, useContext, useState } from 'react';
-import {
-  Alert,
-  NativeSyntheticEvent,
-  Pressable,
-  StyleSheet,
-  Text,
-  TextInput,
-  TextInputChangeEventData,
-  View,
-} from 'react-native';
+import { FC, createRef, useCallback, useContext, useEffect, useState } from 'react';
+import { Alert, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 import { globalContext } from '../context/globalContext';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../route/Router';
 import 'react-native-get-random-values';
 import { nanoid } from 'nanoid';
 import { EGroup } from '../entities/EGroup';
-import { PredefinedColors } from '../lib/Constants';
+import { PredefinedColor, PredefinedColorList } from '../lib/Constants';
 import { LIGHT_DEFAULT_COLOR } from '../theme/color';
 import { PrimaryButton } from '../components/Button';
 import { SafeWithHeaderKeyboardAvoidingView } from '../components/SafeWithHeaderKeyboardAvoidingView';
@@ -36,6 +27,14 @@ const styles = StyleSheet.create({
   },
   title: {
     color: '#000',
+  },
+  colorContainer: {
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'flex-start',
+    alignItems: 'center',
+    gap: 4,
+    flexWrap: 'wrap',
   },
   confirmButton: {
     backgroundColor: LIGHT_DEFAULT_COLOR.button.primary,
@@ -59,6 +58,7 @@ export const CreateGroup: FC<NativeStackScreenProps<RootStackParamList, 'AddGrou
   const [newName, setNewName] = useState<string>('');
   const [newDesc, setDesc] = useState<string>('');
   const { dbConn } = useContext(globalContext);
+  const [selectedColor, setSelectedColor] = useState<PredefinedColor>(PredefinedColorList.dark[0]);
 
   const updateName = useCallback((val: string) => {
     setNewName(val);
@@ -67,24 +67,26 @@ export const CreateGroup: FC<NativeStackScreenProps<RootStackParamList, 'AddGrou
     setDesc(val);
   }, []);
 
-  const onSelectColor = useCallback((color: string) => {
-    console.log('🚀 ~ file: CreateGroup.tsx:78 ~ onSelectColor ~ color:', color);
+  const onSelectColor = useCallback((color: PredefinedColor) => {
+    setSelectedColor(color);
   }, []);
 
-  const addTag = useCallback(async () => {
+  const addGroup = useCallback(async () => {
     if (!dbConn) {
+      Alert.alert('error');
       return;
     }
     if (!newName) {
       Alert.alert('a name is required');
       return;
     }
-    const newTag = new EGroup();
-    newTag.name = newName;
-    newTag.tagId = nanoid();
-    newTag.desc = newDesc;
+    const newGroup = new EGroup();
+    newGroup.name = newName;
+    newGroup.tagId = nanoid();
+    newGroup.desc = newDesc;
+    newGroup.backgroundColor = selectedColor.id;
     dbConn.manager
-      .save(newTag)
+      .save(newGroup)
       .then((_res) => {
         inputRef.current?.clear();
         navigation.goBack();
@@ -92,65 +94,101 @@ export const CreateGroup: FC<NativeStackScreenProps<RootStackParamList, 'AddGrou
       .catch((err) => {
         console.log('🚀 ~ file: CreateTag.tsx:48 ~ addTag ~ err:', err);
       });
-  }, [dbConn, inputRef, navigation, newDesc, newName]);
+  }, [dbConn, inputRef, navigation, newDesc, newName, selectedColor]);
+
+  useEffect(() => {
+    inputRef.current?.focus();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   return (
     <SafeWithHeaderKeyboardAvoidingView>
       <View style={styles.content}>
         {/* top, inputs */}
         <View style={styles.inputs}>
+          {/* name */}
           <View>
-            <Text style={styles.title}>name</Text>
-            <CustomInput multiple={false} onChange={updateName} />
+            <Text style={styles.title}>A Name For The Group</Text>
+            <CustomInput multiple={false} onChange={updateName} ref={inputRef} />
           </View>
+          {/* desc */}
           <View>
-            <Text style={styles.title}>description</Text>
+            <Text style={styles.title}>Description For The Group</Text>
             <CustomInput multiple={true} onChange={updateDesc} />
           </View>
           {/* color picker */}
-          <View style={{ flex: 1 }}>
-            <Text style={styles.title}>Color</Text>
-            <View>
-              {PredefinedColors.dark.map((color) => (
-                <ColorButton key={color} isDark={true} color={color} onClick={onSelectColor} />
+          <View>
+            <Text style={styles.title}>Pick A Color</Text>
+            <View style={styles.colorContainer}>
+              {PredefinedColorList.dark.map((color) => (
+                <ColorButton
+                  key={color.id}
+                  isDark={true}
+                  color={color}
+                  onClick={onSelectColor}
+                  isSelected={selectedColor.id === color.id}
+                />
               ))}
-              <Text>color</Text>
+              {PredefinedColorList.light.map((color) => (
+                <ColorButton
+                  key={color.id}
+                  isDark={false}
+                  color={color}
+                  onClick={onSelectColor}
+                  isSelected={selectedColor.id === color.id}
+                />
+              ))}
             </View>
           </View>
         </View>
         {/* bottom buttons */}
         {/* <TextInput style={styles.nameInput} onChange={updateName} ref={inputRef} /> */}
         <View style={{ width: '100%' }}>
-          <PrimaryButton pressHandler={addTag} name="confirm" />
+          <PrimaryButton pressHandler={addGroup} name="confirm" />
         </View>
       </View>
     </SafeWithHeaderKeyboardAvoidingView>
   );
 };
 
-const ColorButton: FC<{ isDark: boolean; color: string; onClick: (color: string) => void }> = ({
-  isDark,
-  color,
-  onClick,
-}) => {
+const ColorButton: FC<{
+  isSelected: boolean;
+  isDark: boolean;
+  color: PredefinedColor;
+  onClick: (color: PredefinedColor) => void;
+}> = ({ isSelected, isDark, color, onClick }) => {
   const ColorButtonStyle = StyleSheet.create({
     container: {
-      width: 16,
-      height: 16,
+      width: 48,
+      height: 32,
+      borderRadius: 4,
     },
     darkBgContent: {
-      backgroundColor: color,
-      color: '#fff',
+      backgroundColor: color.backgroundColor,
     },
     lightBgContent: {
-      backgroundColor: color,
-      color: '#000',
+      backgroundColor: color.backgroundColor,
+    },
+    selected: {
+      borderWidth: 2,
+      borderStyle: 'dotted',
+    },
+    darkBorder: {
+      borderColor: 'white',
+    },
+    lightBorder: {
+      borderColor: 'white',
     },
   });
   return (
-    <Pressable onPress={() => onClick(color)} style={ColorButtonStyle.container}>
-      <Text style={isDark ? ColorButtonStyle.darkBgContent : ColorButtonStyle.lightBgContent}>
-        {color}
-      </Text>
+    <Pressable onPress={() => onClick(color)}>
+      <View
+        style={[
+          ColorButtonStyle.container,
+          ColorButtonStyle.darkBgContent,
+          isSelected ? ColorButtonStyle.selected : null,
+          isDark ? ColorButtonStyle.darkBorder : ColorButtonStyle.lightBorder,
+        ]}
+      />
     </Pressable>
   );
 };

@@ -9,6 +9,8 @@ export default new DataSource({
   database: 'Crux',
   location: 'default',
   synchronize: true,
+  // TODO: remember to set dropSchema to false
+  dropSchema: true,
   entities: [EGroup, EItem, EExtendItem, EAccount],
   migrations: ['migrations'],
 });
