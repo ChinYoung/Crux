@@ -4,6 +4,7 @@ import { RootStackParamList } from '../route/Router';
 import {
   NativeSyntheticEvent,
   Pressable,
+  ScrollView,
   StyleSheet,
   Text,
   TextInputChangeEventData,
@@ -19,6 +20,14 @@ import { EAccount } from '../entities/EAccount';
 import { PrimaryButton } from '../components/Button';
 import { SafeWithHeaderKeyboardAvoidingView } from '../components/SafeWithHeaderKeyboardAvoidingView';
 import { CustomInput } from '../components/CustomInput';
+import { AddFieldButton } from '../components/AddFieldButton';
+import { FieldEditor } from '../components/FieldEditor';
+import { GlobalStyles } from '../global/styles';
+
+type CustomField = {
+  id: string;
+  label: string;
+};
 
 export const AddAccount: FC<NativeStackScreenProps<RootStackParamList, 'AddItem'>> = ({
   navigation,
@@ -27,6 +36,7 @@ export const AddAccount: FC<NativeStackScreenProps<RootStackParamList, 'AddItem'
   const { dbConn } = useContext(globalContext);
   const inputRef = createRef<TextInput>();
   const { tagId, tagName } = route.params;
+  const [fields, setFields] = useState<CustomField[]>([]);
 
   const [account, setAccount] = useState<string>('');
   const [newName, setNewName] = useState<string>('');
@@ -87,26 +97,45 @@ export const AddAccount: FC<NativeStackScreenProps<RootStackParamList, 'AddItem'
     });
   }, [navigation, tagName]);
 
+  const addField = useCallback(() => {
+    setFields([
+      ...fields,
+      {
+        label: '',
+        id: nanoid(),
+      },
+    ]);
+    console.log('🚀 ~ addField ~ useCallback:');
+  }, [fields]);
+
   return (
     <SafeWithHeaderKeyboardAvoidingView>
-      <View style={styles.container}>
-        <View style={styles.inputs}>
-          <View>
-            <Text>Name</Text>
-            <CustomInput multiple={false} onChange={updateName} />
-          </View>
-          <View>
-            <Text>Account</Text>
-            <CustomInput multiple={false} onChange={updateAccount} />
-          </View>
-          <View>
-            <Text>Password</Text>
-            <CustomInput multiple={false} onChange={updatePassword} />
-          </View>
-          <View>
-            <Text>Dscription</Text>
-            <CustomInput multiple={true} onChange={updateDesc} />
-          </View>
+      <View style={[styles.container]}>
+        <View style={[styles.fields]}>
+          <ScrollView contentContainerStyle={[styles.inputs]}>
+            <View>
+              <Text>Name</Text>
+              <CustomInput multiple={false} onChange={updateName} />
+            </View>
+            <View>
+              <Text>Account</Text>
+              <CustomInput multiple={false} onChange={updateAccount} />
+            </View>
+            <View>
+              <Text>Password</Text>
+              <CustomInput multiple={false} onChange={updatePassword} />
+            </View>
+            <View>
+              <Text>Dscription</Text>
+              <CustomInput multiple={true} onChange={updateDesc} />
+            </View>
+            {fields.map((f) => (
+              <FieldEditor label={f.label} key={f.id} />
+            ))}
+            <View>
+              <AddFieldButton onClick={addField} />
+            </View>
+          </ScrollView>
         </View>
         <PrimaryButton pressHandler={addItem} name="Confirm" />
       </View>
@@ -121,9 +150,14 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     padding: 8,
   },
+  fields: {
+    height: '80%',
+  },
   inputs: {
     display: 'flex',
     gap: 16,
+    paddingBottom: 30,
+    paddingHorizontal: 8,
   },
   input: {
     borderStyle: 'solid',

@@ -26,6 +26,8 @@ import Animated, {
 } from 'react-native-reanimated';
 import { PrimaryButton } from '../components/Button';
 import { SearchInput } from '../components/SearchInput';
+import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
+import { faFilter } from '@fortawesome/free-solid-svg-icons';
 
 export const Home: FC<NativeStackScreenProps<RootStackParamList, 'Home'>> = ({ navigation }) => {
   const { dbConn } = useContext(globalContext);
@@ -107,6 +109,9 @@ export const Home: FC<NativeStackScreenProps<RootStackParamList, 'Home'>> = ({ n
           <Animated.View style={[animatedSearchStyle]}>
             <SearchInput onFocus={expandToSearch} onFold={foldSearch} isExpanded={isExpanded} />
           </Animated.View>
+          <View style={[styles.filterIcon]}>
+            <FontAwesomeIcon icon={faFilter} />
+          </View>
           <Animated.View style={[animatedButtonStyle]}>
             <PrimaryButton pressHandler={toAddPage} name="Create" />
           </Animated.View>
@@ -176,5 +181,16 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     flex: 1,
+  },
+  filterIcon: {
+    borderRadius: 5,
+    borderStyle: 'solid',
+    borderWidth: 1,
+    borderColor: 'blue',
+    display: 'flex',
+    height: 40,
+    justifyContent: 'center',
+    alignItems: 'center',
+    flex: 0.1,
   },
 });
