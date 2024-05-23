@@ -1,5 +1,23 @@
-import { FC } from 'react';
-import { StyleSheet, TextInput, View } from 'react-native';
+import { FC, useCallback } from 'react';
+import {
+  NativeSyntheticEvent,
+  StyleSheet,
+  TextInput,
+  TextInputChangeEventData,
+  TextInputTextInputEventData,
+  View,
+} from 'react-native';
+
+export type CustomField = {
+  id: string;
+  label: string;
+  content: string;
+  labelError: string;
+  contentError: string;
+  validate: (id: string, label: string, content: string) => void;
+  updateLabel: (id: string, newLabel: string) => void;
+  updateContent: (id: string, newContent: string) => void;
+};
 
 const styles = StyleSheet.create({
   root: {
@@ -29,15 +47,27 @@ const styles = StyleSheet.create({
   },
 });
 
-export const FieldEditor: FC<{ label: string; err?: string; onBlur?: () => void }> = ({
+export const FieldEditor: FC<CustomField> = ({
+  id,
+  content,
   label,
-  err,
-  onBlur,
+  labelError,
+  contentError,
+  validate,
+  updateLabel,
+  updateContent,
 }) => {
+  const onInputLabel = useCallback(
+    (text: string) => {
+      updateLabel(id, text);
+      console.log('🚀 ~ onInput ~ event:', text);
+    },
+    [id, updateLabel],
+  );
   return (
     <View style={[styles.root]}>
       <View style={[styles.labelContainer]}>
-        <TextInput placeholder="Input Field Name Here" />
+        <TextInput placeholder="Input Field Name Here" onChangeText={onInputLabel} />
       </View>
       <View style={[styles.inputContainer]}>
         <TextInput placeholder="Input Field Value Here" />

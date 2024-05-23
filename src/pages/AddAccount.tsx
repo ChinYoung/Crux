@@ -21,22 +21,15 @@ import { PrimaryButton } from '../components/Button';
 import { SafeWithHeaderKeyboardAvoidingView } from '../components/SafeWithHeaderKeyboardAvoidingView';
 import { CustomInput } from '../components/CustomInput';
 import { AddFieldButton } from '../components/AddFieldButton';
-import { FieldEditor } from '../components/FieldEditor';
-import { GlobalStyles } from '../global/styles';
-
-type CustomField = {
-  id: string;
-  label: string;
-};
+import { CustomField, FieldEditor } from '../components/FieldEditor';
 
 export const AddAccount: FC<NativeStackScreenProps<RootStackParamList, 'AddItem'>> = ({
   navigation,
   route,
 }) => {
   const { dbConn } = useContext(globalContext);
-  const inputRef = createRef<TextInput>();
   const { tagId, tagName } = route.params;
-  const [fields, setFields] = useState<CustomField[]>([]);
+  const [fields, setFields] = useState<Record<string, CustomField>>({});
 
   const [account, setAccount] = useState<string>('');
   const [newName, setNewName] = useState<string>('');
@@ -97,16 +90,45 @@ export const AddAccount: FC<NativeStackScreenProps<RootStackParamList, 'AddItem'
     });
   }, [navigation, tagName]);
 
+  const validateField = useCallback(
+    (id: string, label: string, content: string) => {
+      if (label && content) {
+        return;
+      }
+      const field = fields[id];
+      setFields({
+        ...fields,
+        [id]: {
+          ...field,
+          labelError: !label ? 'Label is required' : '',
+          contentError: !content ? 'Content is required' : '',
+        },
+      });
+    },
+    [fields],
+  );
+  const updateLabel = useCallback((id: string, label: string) => {
+    console.log('🚀 ~ updateLabel ~ label:', label);
+    console.log('🚀 ~ updateLabel ~ id:', id);
+  }, []);
+  const updateContent = useCallback((id: string, content: string) => {}, []);
+
   const addField = useCallback(() => {
-    setFields([
+    const newFieldId = nanoid();
+    setFields({
       ...fields,
-      {
+      [newFieldId]: {
+        id: newFieldId,
         label: '',
-        id: nanoid(),
+        content: '',
+        labelError: '',
+        contentError: '',
+        validate: validateField,
+        updateLabel,
+        updateContent,
       },
-    ]);
-    console.log('🚀 ~ addField ~ useCallback:');
-  }, [fields]);
+    });
+  }, [fields, updateContent, updateLabel, validateField]);
 
   return (
     <SafeWithHeaderKeyboardAvoidingView>
@@ -129,8 +151,18 @@ export const AddAccount: FC<NativeStackScreenProps<RootStackParamList, 'AddItem'
               <Text>Dscription</Text>
               <CustomInput multiple={true} onChange={updateDesc} />
             </View>
-            {fields.map((f) => (
-              <FieldEditor label={f.label} key={f.id} />
+            {Object.values(fields).map((f) => (
+              <FieldEditor
+                label={f.label}
+                key={f.id}
+                content={f.content}
+                contentError={f.contentError}
+                id={f.id}
+                labelError={f.labelError}
+                updateContent={updateContent}
+                updateLabel={updateLabel}
+                validate={validateField}
+              />
             ))}
             <View>
               <AddFieldButton onClick={addField} />
