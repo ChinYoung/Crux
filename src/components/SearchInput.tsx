@@ -1,28 +1,29 @@
-import { FC, createRef, useCallback, useEffect, useState } from 'react';
-import { Pressable, StyleSheet, TextInput, View } from 'react-native';
+import { FC, createRef, useCallback, useEffect } from 'react';
+import { Pressable, StyleSheet, TextInput } from 'react-native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faSearch } from '@fortawesome/free-solid-svg-icons/faSearch';
-import { GlobalStyles } from '../global/styles';
 
 const styles = StyleSheet.create({
-  searchInputContainer: {
+  container: {
+    padding: 6,
+    height: 40,
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
     borderRadius: 5,
     borderStyle: 'solid',
     borderWidth: 1,
     borderColor: 'blue',
-    display: 'flex',
-    height: 40,
-    justifyContent: 'center',
-    alignItems: 'center',
-    flex: 1,
   },
   expandedStyle: {
-    padding: 6,
-    borderWidth: 1,
+    width: '100%',
+  },
+  clapsedStyle: {
+    width: 40,
   },
   searchInput: {
-    flex: 1,
     width: '100%',
+    height: '100%',
   },
 });
 
@@ -51,7 +52,10 @@ export const SearchInput: FC<{ onFocus: () => void; onFold: () => void; isExpand
     }
   }, [inputRef, isExpanded]);
   return (
-    <View style={[styles.searchInputContainer, isExpanded ? styles.expandedStyle : null]}>
+    <Pressable
+      onPress={expandToSearch}
+      style={[styles.container, isExpanded ? styles.expandedStyle : styles.clapsedStyle]}
+    >
       {isExpanded ? (
         <TextInput
           ref={inputRef}
@@ -60,10 +64,8 @@ export const SearchInput: FC<{ onFocus: () => void; onFold: () => void; isExpand
           onBlur={foldSearch}
         />
       ) : (
-        <Pressable onPress={expandToSearch}>
-          <FontAwesomeIcon icon={faSearch} />
-        </Pressable>
+        <FontAwesomeIcon icon={faSearch} />
       )}
-    </View>
+    </Pressable>
   );
 };

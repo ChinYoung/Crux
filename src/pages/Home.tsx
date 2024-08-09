@@ -29,30 +29,25 @@ import { SearchInput } from '../components/SearchInput';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faFilter } from '@fortawesome/free-solid-svg-icons';
 
+const EXPAND_WIDTH = 160;
+const CLAPSED_WIDTH = 40;
+
 export const Home: FC<NativeStackScreenProps<RootStackParamList, 'Home'>> = ({ navigation }) => {
   const { dbConn } = useContext(globalContext);
   const [allGroups, setAllGroups] = useState<EGroup[]>([]);
   const [isExpanded, setIsExpanded] = useState<boolean>(false);
 
-  const searchPercent = useSharedValue(0.1);
+  const searchInputWidth = useSharedValue(40);
 
-  const updateExpandedVal = useCallback(() => {
-    setIsExpanded(searchPercent.value === 0.7);
-  }, [searchPercent]);
+  const updateIsExpanded = useCallback(() => {
+    setIsExpanded(searchInputWidth.value === EXPAND_WIDTH);
+  }, [searchInputWidth.value]);
 
   const animatedSearchStyle = useAnimatedStyle(
     () => ({
-      flex: withTiming(searchPercent.value, {}, () => {
-        runOnJS(updateExpandedVal)();
+      width: withTiming(searchInputWidth.value, {}, () => {
+        runOnJS(updateIsExpanded)();
       }),
-      display: 'flex',
-    }),
-    [],
-  );
-  const animatedButtonStyle = useAnimatedStyle(
-    () => ({
-      flex: withTiming(1 - searchPercent.value),
-      display: 'flex',
     }),
     [],
   );
@@ -84,14 +79,13 @@ export const Home: FC<NativeStackScreenProps<RootStackParamList, 'Home'>> = ({ n
   }, [refresh, navigation]);
 
   const expandToSearch = useCallback(() => {
-    searchPercent.value = 0.7;
     setIsExpanded(true);
-  }, [searchPercent]);
+    searchInputWidth.value = EXPAND_WIDTH;
+  }, [searchInputWidth]);
 
   const foldSearch = useCallback(() => {
-    searchPercent.value = 0.1;
-    // setIsExpanded(false);
-  }, [searchPercent]);
+    searchInputWidth.value = CLAPSED_WIDTH;
+  }, [searchInputWidth]);
 
   return (
     <SafeWithHeaderKeyboardAvoidingView>
@@ -112,9 +106,9 @@ export const Home: FC<NativeStackScreenProps<RootStackParamList, 'Home'>> = ({ n
           <View style={[styles.filterIcon]}>
             <FontAwesomeIcon icon={faFilter} />
           </View>
-          <Animated.View style={[animatedButtonStyle]}>
+          <View style={{ flex: 1 }}>
             <PrimaryButton pressHandler={toAddPage} name="Create" />
-          </Animated.View>
+          </View>
         </View>
       </View>
     </SafeWithHeaderKeyboardAvoidingView>
@@ -158,29 +152,19 @@ const styles = StyleSheet.create({
     width: '100%',
     left: 0,
     display: 'flex',
-    gap: 8,
     flexDirection: 'row',
-    justifyContent: 'center',
+    gap: 8,
+    justifyContent: 'space-between',
     alignItems: 'center',
     paddingBottom: 10,
     paddingVertical: 8,
     marginTop: 8,
   },
   searchInputContainer: {
-    padding: 6,
     borderWidth: 1,
     borderStyle: 'solid',
     display: 'flex',
     height: 40,
-  },
-  searchInput: {
-    flex: 1,
-  },
-  createButton: {
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    flex: 1,
   },
   filterIcon: {
     borderRadius: 5,
@@ -189,8 +173,8 @@ const styles = StyleSheet.create({
     borderColor: 'blue',
     display: 'flex',
     height: 40,
+    width: 40,
     justifyContent: 'center',
     alignItems: 'center',
-    flex: 0.1,
   },
 });
