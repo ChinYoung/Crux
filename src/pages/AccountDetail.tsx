@@ -1,13 +1,7 @@
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { FC, useCallback, useContext, useEffect, useState } from 'react';
 import { RootStackParamList } from '../route/Router';
-import {
-  NativeSyntheticEvent,
-  Pressable,
-  Text,
-  TextInputChangeEventData,
-  View,
-} from 'react-native';
+import { NativeSyntheticEvent, Text, TextInputChangeEventData, View } from 'react-native';
 import { globalContext } from '../context/globalContext';
 import { StyleSheet } from 'react-native';
 import { TextInput } from 'react-native';

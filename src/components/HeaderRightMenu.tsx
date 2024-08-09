@@ -22,7 +22,7 @@ export const HeaderRightMenu: FC<HeaderRightMenuProps> = ({ title, menuItems }) 
 
   return (
     <View ref={clickOutSideRef}>
-      <PrimaryButton name={title} pressHandler={() => toggleSubMenu('show')} />
+      <PrimaryButton name={title} pressHandler={toggleSubMenu} />
       <Portal hostName="subMenu">
         {isShowSubMenu && (
           <View style={[MenuStyles.subMenu]}>

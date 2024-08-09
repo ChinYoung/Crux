@@ -29,7 +29,7 @@ export const AddAccount: FC<NativeStackScreenProps<RootStackParamList, 'AddItem'
 }) => {
   const { dbConn } = useContext(globalContext);
   const { tagId, tagName } = route.params;
-  const [fields, setFields] = useState<Record<string, CustomField>>({
+  const [extendItems, setExtendItems] = useState<Record<string, CustomField>>({
     name: DefaultFields,
   });
 
@@ -74,7 +74,7 @@ export const AddAccount: FC<NativeStackScreenProps<RootStackParamList, 'AddItem'
         newAccount.password = password;
         newAccount.desc = newDesc;
         newAccount.accountId = nanoid();
-        newAccount.extendedItems = Object.values(fields).map((i) => ({
+        newAccount.extendedItems = Object.values(extendItems).map((i) => ({
           name: i.label,
           content: i.content,
         })) as EExtendItem[];
@@ -88,7 +88,7 @@ export const AddAccount: FC<NativeStackScreenProps<RootStackParamList, 'AddItem'
             console.log('🚀 ~ file: CreateTag.tsx:48 ~ addTag ~ err:', err);
           });
       });
-  }, [dbConn, newName, tagId, account, password, newDesc, fields, navigation]);
+  }, [dbConn, newName, tagId, account, password, newDesc, extendItems, navigation]);
 
   useEffect(() => {
     navigation.setOptions({
@@ -96,14 +96,14 @@ export const AddAccount: FC<NativeStackScreenProps<RootStackParamList, 'AddItem'
     });
   }, [navigation, tagName]);
 
-  const validateField = useCallback(
+  const validateExtendedField = useCallback(
     (id: string, label: string, content: string) => {
       if (label && content) {
         return;
       }
-      const field = fields[id];
-      setFields({
-        ...fields,
+      const field = extendItems[id];
+      setExtendItems({
+        ...extendItems,
         [id]: {
           ...field,
           labelError: !label ? 'Label is required' : '',
@@ -111,33 +111,33 @@ export const AddAccount: FC<NativeStackScreenProps<RootStackParamList, 'AddItem'
         },
       });
     },
-    [fields],
+    [extendItems],
   );
-  const updateLabel = useCallback(
+  const updateExtendedLabel = useCallback(
     (id: string, label: string) => {
-      setFields(
+      setExtendItems(
         Object.fromEntries(
-          Object.entries(fields).map(([k, v]) => [k, v.id === id ? { ...v, label } : v]),
+          Object.entries(extendItems).map(([k, v]) => [k, v.id === id ? { ...v, label } : v]),
         ),
       );
     },
-    [fields],
+    [extendItems],
   );
-  const updateContent = useCallback(
+  const updateExtendedContent = useCallback(
     (id: string, content: string) => {
-      setFields(
+      setExtendItems(
         Object.fromEntries(
-          Object.entries(fields).map(([k, v]) => [k, v.id === id ? { ...v, content } : v]),
+          Object.entries(extendItems).map(([k, v]) => [k, v.id === id ? { ...v, content } : v]),
         ),
       );
     },
-    [fields],
+    [extendItems],
   );
 
   const addNewField = useCallback(() => {
     const newFieldId = nanoid();
-    setFields({
-      ...fields,
+    setExtendItems({
+      ...extendItems,
       [newFieldId]: {
         id: newFieldId,
         label: '',
@@ -146,7 +146,7 @@ export const AddAccount: FC<NativeStackScreenProps<RootStackParamList, 'AddItem'
         contentError: '',
       },
     });
-  }, [fields]);
+  }, [extendItems]);
 
   return (
     <SafeWithHeaderKeyboardAvoidingView>
@@ -168,7 +168,7 @@ export const AddAccount: FC<NativeStackScreenProps<RootStackParamList, 'AddItem'
             <Text>Dscription</Text>
             <CustomInput multiple={true} onChange={updateDesc} />
           </View>
-          {Object.values(fields).map((f) => (
+          {Object.values(extendItems).map((f) => (
             <FieldEditor
               key={f.id}
               label={f.label}
@@ -176,9 +176,9 @@ export const AddAccount: FC<NativeStackScreenProps<RootStackParamList, 'AddItem'
               contentError={f.contentError}
               id={f.id}
               labelError={f.labelError}
-              updateContent={updateContent}
-              updateLabel={updateLabel}
-              validate={validateField}
+              updateContent={updateExtendedContent}
+              updateLabel={updateExtendedLabel}
+              validate={validateExtendedField}
             />
           ))}
           <View>
