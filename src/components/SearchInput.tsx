@@ -2,6 +2,7 @@ import { FC, createRef, useCallback, useEffect } from 'react';
 import { Pressable, StyleSheet, TextInput } from 'react-native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faSearch } from '@fortawesome/free-solid-svg-icons/faSearch';
+import { LIGHT_DEFAULT_COLOR } from '../theme/color';
 
 const styles = StyleSheet.create({
   container: {
@@ -13,7 +14,7 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     borderStyle: 'solid',
     borderWidth: 1,
-    borderColor: 'blue',
+    borderColor: LIGHT_DEFAULT_COLOR.button.postive,
   },
   expandedStyle: {
     width: '100%',
@@ -32,17 +33,13 @@ export const SearchInput: FC<{ onFocus: () => void; onFold: () => void; isExpand
   onFold,
   isExpanded,
 }) => {
-  console.log('🚀 ~ isExpanded:', isExpanded);
   const inputRef = createRef<TextInput>();
-  // const [isExpanded, setIsExpanded] = useState<boolean>(false);
 
   const foldSearch = useCallback(() => {
-    // setIsExpanded(false);
     onFold();
   }, [onFold]);
 
   const expandToSearch = useCallback(() => {
-    // setIsExpanded(true);
     onFocus();
   }, [onFocus]);
 

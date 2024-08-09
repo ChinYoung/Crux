@@ -28,6 +28,7 @@ import { PrimaryButton } from '../components/Button';
 import { SearchInput } from '../components/SearchInput';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faFilter } from '@fortawesome/free-solid-svg-icons';
+import { LIGHT_DEFAULT_COLOR } from '../theme/color';
 
 const EXPAND_WIDTH = 160;
 const CLAPSED_WIDTH = 40;
@@ -170,7 +171,7 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     borderStyle: 'solid',
     borderWidth: 1,
-    borderColor: 'blue',
+    borderColor: LIGHT_DEFAULT_COLOR.button.postive,
     display: 'flex',
     height: 40,
     width: 40,
