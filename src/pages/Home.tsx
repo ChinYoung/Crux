@@ -95,7 +95,7 @@ export const Home: FC<NativeStackScreenProps<RootStackParamList, 'Home'>> = ({ n
         <Pressable onPress={Keyboard.dismiss} style={[styles.container]}>
           <View style={styles.contentWrapper}>
             {allGroups.map((_i) => (
-              <Capsule group={_i} key={_i.id} toDetail={() => toTagDetail(_i.tagId)} />
+              <Capsule group={_i} key={_i.id} toDetail={() => toTagDetail(_i.groupId)} />
             ))}
           </View>
         </Pressable>

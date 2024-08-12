@@ -43,11 +43,6 @@ export const HeaderRightMenu: FC<HeaderRightMenuProps> = ({ title, menuItems }) 
 };
 
 const MenuStyles = StyleSheet.create({
-  debug: {
-    borderStyle: 'solid',
-    borderColor: 'blue',
-    borderWidth: 1,
-  },
   subMenu: {
     position: 'absolute',
     top: 0,

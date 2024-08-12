@@ -1,7 +1,6 @@
 import { useHeaderHeight } from '@react-navigation/elements';
 import { FC, PropsWithChildren } from 'react';
 import { KeyboardAvoidingView, SafeAreaView, StyleSheet } from 'react-native';
-import { GlobalStyles } from '../global/styles';
 
 const styles = StyleSheet.create({
   root: {
@@ -18,7 +17,7 @@ export const SafeWithHeaderKeyboardAvoidingView: FC<PropsWithChildren> = ({ chil
   // TODO: accumulate header height
 
   return (
-    <SafeAreaView style={[styles.root, GlobalStyles.debug]}>
+    <SafeAreaView style={[styles.root]}>
       <KeyboardAvoidingView
         style={styles.root}
         behavior="padding"

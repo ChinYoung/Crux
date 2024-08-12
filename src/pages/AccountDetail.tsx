@@ -1,165 +1,37 @@
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { FC, useCallback, useContext, useEffect, useState } from 'react';
+import {
+  FC,
+  forwardRef,
+  useCallback,
+  useContext,
+  useEffect,
+  useImperativeHandle,
+  useRef,
+  useState,
+} from 'react';
 import { RootStackParamList } from '../route/Router';
-import { NativeSyntheticEvent, Text, TextInputChangeEventData, View } from 'react-native';
+import { Text, View } from 'react-native';
 import { globalContext } from '../context/globalContext';
 import { StyleSheet } from 'react-native';
-import { TextInput } from 'react-native';
 import { EExtendItem } from '../entities/EExtendItem';
 import { EAccount } from '../entities/EAccount';
-import { NegtiveButton, PrimaryButton } from '../components/Button';
+import { PrimaryButton } from '../components/Button';
 import { Alert } from 'react-native';
+import { createExtendField, FieldEditor } from '../components/FieldEditor';
+import { AddFieldButton } from '../components/AddFieldButton';
+import { CustomInput } from '../components/CustomInput';
+import { EGroup } from '../entities/EGroup';
+import { nanoid } from 'nanoid';
 
-export const AccountDetail: FC<NativeStackScreenProps<RootStackParamList, 'AccountDetail'>> = ({
-  navigation,
-  route,
-}) => {
-  const { accountId, name } = route.params;
-  const { dbConn } = useContext(globalContext);
-  const [item, setItem] = useState<EAccount>();
-  const [showAddExtend, setShowAddExtend] = useState<boolean>(false);
+function createBlankAccount() {
+  const defaultAccount = new EAccount();
+  defaultAccount.desc = '';
+  const { newExtendItem } = createExtendField();
+  defaultAccount.extendedItems = [newExtendItem] as EExtendItem[];
+  return defaultAccount;
+}
 
-  const [extendName, setExtendName] = useState<string>('');
-  const [extendValue, setExtendValue] = useState<string>('');
-
-  const refresh = useCallback(() => {
-    dbConn?.manager
-      .findOne(EAccount, {
-        where: { accountId },
-        relations: { extendedItems: true },
-      })
-      .then((itemValue) => {
-        if (!itemValue) {
-          return;
-        }
-        setItem(itemValue);
-      });
-  }, [accountId, dbConn?.manager]);
-
-  const showAddExtendedItem = useCallback(() => {
-    setShowAddExtend(true);
-  }, []);
-
-  const cancelAddExtend = useCallback(() => {
-    setShowAddExtend(false);
-  }, []);
-
-  const confirmToAddExtend = useCallback(() => {
-    if (!dbConn?.manager) {
-      return;
-    }
-    if (!item) {
-      return;
-    }
-    const extendItem = dbConn.manager.create(EExtendItem, {
-      name: extendName,
-      content: extendValue,
-    });
-
-    item.extendedItems.push(extendItem);
-    dbConn.manager.save(item).then(() => {
-      setExtendName('');
-      setExtendValue('');
-      refresh();
-      setShowAddExtend(false);
-    });
-  }, [dbConn, extendName, extendValue, item, refresh]);
-
-  const deleteAccount = useCallback(async () => {
-    console.log('🚀 ~ file: AccountDetail.tsx:77 ~ deleteAccount ~ accountId:', accountId);
-    const targetAccount = await dbConn?.manager.findOne(EAccount, {
-      where: { accountId },
-      relations: { extendedItems: true },
-    });
-    if (!targetAccount) {
-      return;
-    }
-    await dbConn?.manager.remove(targetAccount);
-    navigation.goBack();
-  }, [accountId, dbConn?.manager, navigation]);
-
-  const confirmToDelete = useCallback(() => {
-    Alert.alert('Warning', 'Confirm to delete?', [
-      {
-        text: 'Cancel',
-      },
-      {
-        text: 'Confirm',
-        onPress: deleteAccount,
-      },
-    ]);
-  }, [deleteAccount]);
-
-  const updateExtendName = useCallback((_e: NativeSyntheticEvent<TextInputChangeEventData>) => {
-    setExtendName(_e.nativeEvent.text);
-  }, []);
-  const updateExtengValue = useCallback((_e: NativeSyntheticEvent<TextInputChangeEventData>) => {
-    setExtendValue(_e.nativeEvent.text);
-  }, []);
-
-  useEffect(() => {
-    navigation.setOptions({ title: name });
-  }, [name, navigation]);
-  useEffect(() => {
-    refresh();
-  }, [refresh]);
-
-  return (
-    <View style={styles.container}>
-      {/* info on the top */}
-      <View style={styles.contentContainer}>
-        <View style={styles.descContainer}>
-          {/* <Text>description:</Text> */}
-          <Text style={styles.description}>{item?.desc}</Text>
-        </View>
-        <LocalKeyValue keyName="name:" value={item?.name ?? ''} />
-        <LocalKeyValue keyName="account:" value={item?.account ?? ''} />
-        <LocalKeyValue keyName="password:" value={item?.password ?? ''} />
-        {item?.extendedItems.map((_e) => (
-          <LocalKeyValue keyName={_e.name} value={_e.content} key={_e.id} />
-        ))}
-        {showAddExtend ? (
-          <View style={styles.addExtendContainer}>
-            <TextInput
-              style={styles.addExtendName}
-              onChange={updateExtendName}
-              placeholder="Name"
-            />
-            <TextInput
-              style={styles.addExtendValue}
-              onChange={updateExtengValue}
-              placeholder="Value"
-            />
-          </View>
-        ) : null}
-      </View>
-      {/* buttons on the bottom */}
-      <View style={styles.operations}>
-        {showAddExtend ? (
-          <View style={styles.addExtentdButtonContainer}>
-            <NegtiveButton pressHandler={cancelAddExtend} name="Cancel" />
-            <PrimaryButton pressHandler={confirmToAddExtend} name="Confirm" />
-          </View>
-        ) : (
-          <View style={styles.addExtentdButtonContainer}>
-            <View style={{ display: 'flex', flexDirection: 'row', gap: 4 }}>
-              <View style={{ flex: 1 }}>
-                <PrimaryButton pressHandler={confirmToDelete} name="Delete" />
-              </View>
-              <View style={{ flex: 1 }}>
-                <PrimaryButton pressHandler={showAddExtendedItem} name="Add" />
-              </View>
-            </View>
-            <PrimaryButton pressHandler={showAddExtendedItem} name="Add to favorite" />
-          </View>
-        )}
-        {/* <View style={{ flex: 1, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-          <Text>Favirite</Text>
-        </View> */}
-      </View>
-    </View>
-  );
-};
+type FormProps = { account: EAccount; isEditing?: boolean };
 
 const LocalKeyValue: FC<{ keyName: string; value: string }> = ({ keyName: key, value }) => (
   <View style={styles.keyValueContainer}>
@@ -181,6 +53,9 @@ const styles = StyleSheet.create({
   },
   contentContainer: {
     padding: 12,
+    display: 'flex',
+    flexDirection: 'column',
+    gap: 16,
   },
   descContainer: {
     paddingBottom: 16,
@@ -238,3 +113,277 @@ const styles = StyleSheet.create({
     lineHeight: 16,
   },
 });
+
+const AccountForm = forwardRef<any, FormProps>(({ account, isEditing = true }, ref) => {
+  const [name, setName] = useState<string>('');
+  const [desc, setDesc] = useState<string>('');
+  const [extendedItems, setExtendedItems] = useState<EExtendItem[]>([]);
+  useImperativeHandle(ref, () => {
+    return {
+      getValues() {
+        return {
+          name,
+          desc,
+          extendedItems,
+        };
+      },
+    };
+  });
+  const updateLabel = useCallback(
+    (itemId: string, label: string) => {
+      setExtendedItems(
+        extendedItems.map((i) => ({
+          ...i,
+          name: i.extendItemId === itemId ? label : i.name,
+        })),
+      );
+    },
+    [extendedItems],
+  );
+  const updateField = useCallback(
+    (itemId: string, content: string) => {
+      setExtendedItems(
+        extendedItems.map((i) => ({
+          ...i,
+          content: i.extendItemId === itemId ? content : i.content,
+        })),
+      );
+    },
+    [extendedItems],
+  );
+
+  const addNewField = useCallback(() => {
+    const { newExtendItem } = createExtendField();
+    setExtendedItems([...extendedItems, newExtendItem] as EExtendItem[]);
+  }, [extendedItems]);
+
+  useEffect(() => {
+    setExtendedItems(account.extendedItems);
+    setName(account.name);
+    setDesc(account.desc);
+  }, [account.desc, account.extendedItems, account.name]);
+  return (
+    <View style={styles.contentContainer}>
+      {isEditing ? (
+        <View>
+          <Text>Name</Text>
+          <CustomInput multiple={false} onChange={setName} value={name} />
+        </View>
+      ) : null}
+      {isEditing ? (
+        <View>
+          <Text>Dscription</Text>
+          <CustomInput multiple={true} onChange={setDesc} value={desc} />
+        </View>
+      ) : (
+        <View style={styles.descContainer}>
+          <Text style={styles.description}>{account?.desc}</Text>
+        </View>
+      )}
+      {extendedItems.map((_e) => {
+        return isEditing ? (
+          <FieldEditor
+            key={_e.extendItemId}
+            extendItemId={_e.extendItemId}
+            name={_e.name}
+            content={_e.content}
+            updateContent={updateField}
+            updateLabel={updateLabel}
+          />
+        ) : (
+          <LocalKeyValue key={_e.extendItemId} keyName={_e.name} value={_e.content} />
+        );
+      })}
+      {isEditing && (
+        <View>
+          <AddFieldButton onClick={addNewField} />
+        </View>
+      )}
+    </View>
+  );
+});
+
+export const AddAccount: FC<NativeStackScreenProps<RootStackParamList, 'AddItem'>> = ({
+  navigation,
+  route,
+}) => {
+  const { dbConn } = useContext(globalContext);
+  const { groupId, name } = route.params;
+  const [item, setItem] = useState<EAccount>();
+  const formRef = useRef<{ getValues: () => EAccount }>();
+
+  const createNewAccount = useCallback(() => {
+    if (!dbConn) {
+      return;
+    }
+    const values = formRef.current?.getValues();
+    if (!values) {
+      return;
+    }
+    if (!values.name) {
+      Alert.alert('a name is required');
+      return;
+    }
+    dbConn.manager
+      .findOne(EGroup, {
+        where: { groupId },
+        relations: { accountList: true },
+      })
+      .then((group) => {
+        if (!group) {
+          return;
+        }
+        const newAccount = dbConn.manager.create(EAccount, {
+          ...item,
+          ...values,
+          accountId: nanoid(),
+        });
+        newAccount.extendedItems = values.extendedItems.map((i) => {
+          return dbConn.manager.create(EExtendItem, {
+            extendItemId: i.extendItemId,
+            name: i.name,
+            content: i.content,
+          });
+        }) as EExtendItem[];
+        group.accountList.push(newAccount);
+        dbConn.manager
+          .save(group)
+          .then((_res) => {
+            navigation.goBack();
+          })
+          .catch((err) => {
+            console.log('🚀 ~ file: CreateTag.tsx:48 ~ addTag ~ err:', err);
+          });
+      });
+  }, [dbConn, groupId, item, navigation]);
+
+  useEffect(() => {
+    setItem(createBlankAccount());
+    navigation.setOptions({
+      title: `Add an item to group: ${name}`,
+    });
+  }, [name, navigation]);
+  return (
+    <View style={styles.container}>
+      {item && <AccountForm account={item} ref={formRef} />}
+      <PrimaryButton pressHandler={createNewAccount} name="Save" />
+    </View>
+  );
+};
+
+export const AccountDetail: FC<NativeStackScreenProps<RootStackParamList, 'AccountDetail'>> = ({
+  navigation,
+  route,
+}) => {
+  const { dbConn } = useContext(globalContext);
+  const { accountId, name } = route.params;
+  const [item, setItem] = useState<EAccount>();
+  const [isEditing, setIsEditing] = useState<boolean>(false);
+  const formRef = useRef<{ getValues: () => EAccount }>();
+
+  const startEdit = useCallback(() => {
+    setIsEditing(true);
+  }, []);
+
+  const getAccountDetail = useCallback(
+    async (id: string) => {
+      const res = await dbConn?.manager.findOne(EAccount, {
+        where: { accountId: id },
+        relations: { extendedItems: true },
+      });
+      return res;
+    },
+    [dbConn?.manager],
+  );
+
+  const refresh = useCallback(async () => {
+    if (!accountId) {
+      return;
+    }
+    const account = await getAccountDetail(accountId);
+    if (!account) {
+      return;
+    }
+    setItem(account);
+  }, [accountId, getAccountDetail]);
+
+  const updateAccount = useCallback(() => {
+    const values = formRef.current?.getValues();
+    if (!dbConn?.manager) {
+      return;
+    }
+    if (!values) {
+      return;
+    }
+    const newAccount = dbConn.manager.create(EAccount, {
+      ...item,
+      ...values,
+    });
+    newAccount.extendedItems = values.extendedItems.map((i) => {
+      if (i.id) {
+        const extendedItem = dbConn.manager.create(EExtendItem, i);
+        return extendedItem;
+      }
+      return dbConn.manager.create(EExtendItem, {
+        extendItemId: i.extendItemId,
+        name: i.name,
+        content: i.content,
+      });
+    }) as EExtendItem[];
+
+    dbConn.manager
+      .save<EAccount>(newAccount)
+      .then(() => {
+        refresh();
+        setIsEditing(false);
+      })
+      .catch((err) => {
+        console.log('🚀 ~ dbConn.manager.save ~ err:', err);
+      });
+  }, [dbConn, item, refresh]);
+
+  const deleteAccount = useCallback(async () => {
+    const targetAccount = await dbConn?.manager.findOne(EAccount, {
+      where: { accountId },
+      relations: { extendedItems: true },
+    });
+    if (!targetAccount) {
+      return;
+    }
+    await dbConn?.manager.remove(targetAccount);
+    navigation.goBack();
+  }, [accountId, dbConn?.manager, navigation]);
+
+  const confirmToDelete = useCallback(() => {
+    Alert.alert('Warning', 'Confirm to delete?', [
+      {
+        text: 'Cancel',
+      },
+      {
+        text: 'Confirm',
+        onPress: deleteAccount,
+      },
+    ]);
+  }, [deleteAccount]);
+
+  useEffect(() => {
+    navigation.setOptions({ title: name });
+  }, [name, navigation]);
+
+  useEffect(() => {
+    refresh();
+  }, [refresh]);
+
+  return (
+    <View style={styles.container}>
+      {item && <AccountForm account={item} isEditing={isEditing} ref={formRef} />}
+      {/* buttons on the bottom */}
+      <View style={styles.operations}>
+        <View style={styles.addExtentdButtonContainer}>
+          {isEditing && <PrimaryButton pressHandler={updateAccount} name="Save" />}
+          {!isEditing && <PrimaryButton pressHandler={startEdit} name="Edit" />}
+        </View>
+      </View>
+    </View>
+  );
+};

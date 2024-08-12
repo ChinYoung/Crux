@@ -14,6 +14,9 @@ export class EExtendItem {
   @PrimaryGeneratedColumn()
   id: number;
 
+  @Column(ColumnType.varchar)
+  extendItemId: string;
+
   @CreateDateColumn()
   createdAt: Date;
 

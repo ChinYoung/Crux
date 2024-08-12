@@ -22,7 +22,7 @@ export class EGroup {
   backgroundColor: string;
 
   @Column(ColumnType.varchar)
-  tagId: string;
+  groupId: string;
 
   @PrimaryGeneratedColumn()
   id: number;

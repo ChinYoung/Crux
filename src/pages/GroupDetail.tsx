@@ -1,6 +1,6 @@
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { FC, useCallback, useContext, useEffect, useState } from 'react';
-import { Pressable, SafeAreaView, StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { RootStackParamList } from '../route/Router';
 import { EGroup } from '../entities/EGroup';
 import { globalContext } from '../context/globalContext';
@@ -24,13 +24,13 @@ export const GroupDetail: FC<NativeStackScreenProps<RootStackParamList, 'GroupDe
     if (!group) {
       return;
     }
-    navigation.navigate('AddItem', { tagId: group.tagId, tagName: group.name });
+    navigation.navigate('AddItem', { groupId: group.groupId, name: group.name });
   }, [navigation, group]);
 
   const refresh = useCallback(() => {
     dbConn
       ?.getRepository(EGroup)
-      .findOne({ relations: { accountList: true }, where: { tagId: id } })
+      .findOne({ relations: { accountList: true }, where: { groupId: id } })
       .then((res) => {
         console.log('🚀 ~ file: GroupDetail.tsx:85 ~ .then ~ res:', res);
         if (!res) {
@@ -115,13 +115,13 @@ export const GroupDetail: FC<NativeStackScreenProps<RootStackParamList, 'GroupDe
 const AccountItem: FC<{
   account: EAccount;
   toAccountDetail: (itemId: string, name: string) => void;
-}> = ({ account: { account, name, accountId }, toAccountDetail }) => {
+}> = ({ account: { name, accountId }, toAccountDetail }) => {
   return (
     <Pressable onPress={() => toAccountDetail(accountId, name)}>
       <View style={AccountStyles.container}>
         <Text style={AccountStyles.name}>{name}</Text>
         <Text numberOfLines={1} style={[AccountStyles.account]}>
-          {account}
+          {name}
         </Text>
       </View>
     </Pressable>
@@ -129,11 +129,6 @@ const AccountItem: FC<{
 };
 
 const styles = StyleSheet.create({
-  debug: {
-    borderStyle: 'solid',
-    borderColor: 'blue',
-    borderWidth: 1,
-  },
   container: {
     position: 'relative',
     width: '100%',

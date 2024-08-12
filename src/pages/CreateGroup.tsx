@@ -82,7 +82,7 @@ export const CreateGroup: FC<NativeStackScreenProps<RootStackParamList, 'AddGrou
     }
     const newGroup = new EGroup();
     newGroup.name = newName;
-    newGroup.tagId = nanoid();
+    newGroup.groupId = nanoid();
     newGroup.desc = newDesc;
     newGroup.backgroundColor = selectedColor.id;
     dbConn.manager

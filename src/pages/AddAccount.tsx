@@ -12,40 +12,26 @@ import { PrimaryButton } from '../components/Button';
 import { SafeWithHeaderKeyboardAvoidingView } from '../components/SafeWithHeaderKeyboardAvoidingView';
 import { CustomInput } from '../components/CustomInput';
 import { AddFieldButton } from '../components/AddFieldButton';
-import { CustomField, FieldEditor } from '../components/FieldEditor';
+import { createExtendField, CustomField, FieldEditor } from '../components/FieldEditor';
 import { EExtendItem } from '../entities/EExtendItem';
 
-const DefaultFields: CustomField = {
-  id: 'name',
-  content: '',
-  contentError: '',
-  label: '',
-  labelError: '',
-};
-
+const { newFieldId: firstId, newExtendItem: firstItem } = createExtendField();
 export const AddAccount: FC<NativeStackScreenProps<RootStackParamList, 'AddItem'>> = ({
   navigation,
   route,
 }) => {
-  const { dbConn } = useContext(globalContext);
-  const { tagId, tagName } = route.params;
   const [extendItems, setExtendItems] = useState<Record<string, CustomField>>({
-    name: DefaultFields,
+    [firstId]: firstItem,
   });
+  const { dbConn } = useContext(globalContext);
+  const { groupId } = route.params;
 
-  const [account, setAccount] = useState<string>('');
+  console.log('🚀 ~ extendItems:', extendItems);
   const [newName, setNewName] = useState<string>('');
-  const [password, setPassword] = useState<string>('');
   const [newDesc, setDesc] = useState<string>('');
 
-  const updateAccount = useCallback((val: string) => {
-    setAccount(val);
-  }, []);
   const updateName = useCallback((val: string) => {
     setNewName(val);
-  }, []);
-  const updatePassword = useCallback((val: string) => {
-    setPassword(val);
   }, []);
   const updateDesc = useCallback((val: string) => {
     setDesc(val);
@@ -61,7 +47,7 @@ export const AddAccount: FC<NativeStackScreenProps<RootStackParamList, 'AddItem'
     }
     dbConn.manager
       .findOne(EGroup, {
-        where: { tagId },
+        where: { groupId },
         relations: { accountList: true },
       })
       .then((group) => {
@@ -70,12 +56,11 @@ export const AddAccount: FC<NativeStackScreenProps<RootStackParamList, 'AddItem'
         }
         const newAccount = new EAccount();
         newAccount.name = newName;
-        newAccount.account = account;
-        newAccount.password = password;
         newAccount.desc = newDesc;
         newAccount.accountId = nanoid();
         newAccount.extendedItems = Object.values(extendItems).map((i) => ({
-          name: i.label,
+          extendItemId: i.extendItemId,
+          name: i.name,
           content: i.content,
         })) as EExtendItem[];
         group.accountList.push(newAccount);
@@ -88,13 +73,13 @@ export const AddAccount: FC<NativeStackScreenProps<RootStackParamList, 'AddItem'
             console.log('🚀 ~ file: CreateTag.tsx:48 ~ addTag ~ err:', err);
           });
       });
-  }, [dbConn, newName, tagId, account, password, newDesc, extendItems, navigation]);
+  }, [dbConn, newName, groupId, newDesc, extendItems, navigation]);
 
   useEffect(() => {
     navigation.setOptions({
       title: `Create an account`,
     });
-  }, [navigation, tagName]);
+  }, [navigation]);
 
   const validateExtendedField = useCallback(
     (id: string, label: string, content: string) => {
@@ -114,20 +99,26 @@ export const AddAccount: FC<NativeStackScreenProps<RootStackParamList, 'AddItem'
     [extendItems],
   );
   const updateExtendedLabel = useCallback(
-    (id: string, label: string) => {
+    (itemId: string, name: string) => {
       setExtendItems(
         Object.fromEntries(
-          Object.entries(extendItems).map(([k, v]) => [k, v.id === id ? { ...v, label } : v]),
+          Object.entries(extendItems).map(([k, v]) => [
+            k,
+            v.extendItemId === itemId ? { ...v, name } : v,
+          ]),
         ),
       );
     },
     [extendItems],
   );
   const updateExtendedContent = useCallback(
-    (id: string, content: string) => {
+    (itemId: string, content: string) => {
       setExtendItems(
         Object.fromEntries(
-          Object.entries(extendItems).map(([k, v]) => [k, v.id === id ? { ...v, content } : v]),
+          Object.entries(extendItems).map(([k, v]) => [
+            k,
+            v.extendItemId === itemId ? { ...v, content } : v,
+          ]),
         ),
       );
     },
@@ -135,16 +126,10 @@ export const AddAccount: FC<NativeStackScreenProps<RootStackParamList, 'AddItem'
   );
 
   const addNewField = useCallback(() => {
-    const newFieldId = nanoid();
+    const { newFieldId, newExtendItem } = createExtendField();
     setExtendItems({
       ...extendItems,
-      [newFieldId]: {
-        id: newFieldId,
-        label: '',
-        content: '',
-        labelError: '',
-        contentError: '',
-      },
+      [newFieldId]: newExtendItem,
     });
   }, [extendItems]);
 
@@ -157,24 +142,16 @@ export const AddAccount: FC<NativeStackScreenProps<RootStackParamList, 'AddItem'
             <CustomInput multiple={false} onChange={updateName} />
           </View>
           <View>
-            <Text>Account</Text>
-            <CustomInput multiple={false} onChange={updateAccount} />
-          </View>
-          <View>
-            <Text>Password</Text>
-            <CustomInput multiple={false} onChange={updatePassword} />
-          </View>
-          <View>
             <Text>Dscription</Text>
             <CustomInput multiple={true} onChange={updateDesc} />
           </View>
           {Object.values(extendItems).map((f) => (
             <FieldEditor
-              key={f.id}
-              label={f.label}
+              key={f.extendItemId}
+              name={f.name}
               content={f.content}
               contentError={f.contentError}
-              id={f.id}
+              extendItemId={f.extendItemId}
               labelError={f.labelError}
               updateContent={updateExtendedContent}
               updateLabel={updateExtendedLabel}

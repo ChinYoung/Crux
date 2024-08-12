@@ -39,8 +39,8 @@ const styles = StyleSheet.create({
 });
 const CustomInputComponent: ForwardRefRenderFunction<
   TextInput,
-  { multiple: boolean; onChange: (val: string) => void }
-> = ({ onChange, multiple }, ref) => {
+  { value?: string; multiple: boolean; onChange: (val: string) => void }
+> = ({ onChange, multiple, value }, ref) => {
   const [isActivated, setIsActivated] = useState(false);
   const onChangeHandler = useCallback(
     (_e: NativeSyntheticEvent<TextInputChangeEventData>) => {
@@ -70,6 +70,7 @@ const CustomInputComponent: ForwardRefRenderFunction<
         onChange={onChangeHandler}
         onFocus={activate}
         onBlur={deactivate}
+        value={value}
       />
     </View>
   );

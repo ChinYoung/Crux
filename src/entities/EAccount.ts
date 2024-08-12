@@ -39,12 +39,6 @@ export class EAccount {
   })
   extendedItems: EExtendItem[];
 
-  @Column(ColumnType.varchar)
-  account: string;
-
-  @Column(ColumnType.text)
-  password: string;
-
   @Column(ColumnType.text)
   desc: string;
 }

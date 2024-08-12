@@ -1,18 +1,34 @@
+import 'react-native-get-random-values';
+import { nanoid } from 'nanoid';
 import { FC, useCallback } from 'react';
 import { StyleSheet, TextInput, View } from 'react-native';
 
 export type CustomField = {
-  id: string;
-  label: string;
+  extendItemId: string;
+  name: string;
   content: string;
-  labelError: string;
-  contentError: string;
+  labelError?: string;
+  contentError?: string;
 };
 
+export function createExtendField() {
+  const newFieldId = nanoid();
+  return {
+    newFieldId,
+    newExtendItem: {
+      extendItemId: newFieldId,
+      name: '',
+      content: '',
+      labelError: '',
+      contentError: '',
+    } as CustomField,
+  };
+}
+
 export type FieldFunctions = {
-  validate: (id: string, label: string, content: string) => void;
   updateLabel: (id: string, newLabel: string) => void;
   updateContent: (id: string, newContent: string) => void;
+  validate?: (id: string, label: string, content: string) => void;
 };
 
 const styles = StyleSheet.create({
@@ -31,7 +47,7 @@ const styles = StyleSheet.create({
     borderBottomColor: 'black',
     borderBottomWidth: 1,
     borderStyle: 'solid',
-    width: '45%',
+    width: '65%',
     paddingVertical: 4,
   },
   inputContainer: {
@@ -44,8 +60,8 @@ const styles = StyleSheet.create({
 });
 
 export const FieldEditor: FC<CustomField & FieldFunctions> = ({
-  id,
-  label,
+  extendItemId: itemId,
+  name,
   content,
   labelError,
   contentError,
@@ -55,15 +71,15 @@ export const FieldEditor: FC<CustomField & FieldFunctions> = ({
 }) => {
   const onInputLabel = useCallback(
     (text: string) => {
-      updateLabel(id, text);
+      updateLabel(itemId, text);
     },
-    [id, updateLabel],
+    [itemId, updateLabel],
   );
   const onInputContent = useCallback(
     (text: string) => {
-      updateContent(id, text);
+      updateContent(itemId, text);
     },
-    [id, updateContent],
+    [itemId, updateContent],
   );
   return (
     <View style={[styles.root]}>
@@ -71,7 +87,7 @@ export const FieldEditor: FC<CustomField & FieldFunctions> = ({
         <TextInput
           placeholder="Input Field Name Here"
           onChangeText={onInputLabel}
-          value={label}
+          value={name}
           autoCapitalize="none"
         />
       </View>

@@ -15,10 +15,8 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { CreateGroup } from './src/pages/CreateGroup';
 import { RootStackParamList } from './src/route/Router';
 import { GroupDetail } from './src/pages/GroupDetail';
-import { AddAccount } from './src/pages/AddAccount';
-import { AccountDetail } from './src/pages/AccountDetail';
+import { AccountDetail, AddAccount } from './src/pages/AccountDetail';
 import { LIGHT_DEFAULT_COLOR } from './src/theme/color';
-import { View, Text } from 'react-native';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 

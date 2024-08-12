@@ -14,3 +14,11 @@ declare type MenuConfig = {
   name: string;
   handler: () => void;
 };
+
+declare type ExtendItem = {
+  id: string;
+  label: string;
+  content: string;
+  labelError: string;
+  contentError: string;
+};
