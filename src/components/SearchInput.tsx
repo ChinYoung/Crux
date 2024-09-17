@@ -28,10 +28,10 @@ const styles = StyleSheet.create({
   },
 });
 
-export const SearchInput: FC<{ onFocus: () => void; onFold: () => void; isExpanded: boolean }> = ({
+export const SearchInput: FC<{ onFocus: () => void; onFold: () => void; isSearch: boolean }> = ({
   onFocus,
   onFold,
-  isExpanded,
+  isSearch,
 }) => {
   const inputRef = createRef<TextInput>();
 
@@ -44,16 +44,16 @@ export const SearchInput: FC<{ onFocus: () => void; onFold: () => void; isExpand
   }, [onFocus]);
 
   useEffect(() => {
-    if (isExpanded) {
+    if (isSearch) {
       inputRef.current?.focus();
     }
-  }, [inputRef, isExpanded]);
+  }, [inputRef, isSearch]);
   return (
     <Pressable
       onPress={expandToSearch}
-      style={[styles.container, isExpanded ? styles.expandedStyle : styles.clapsedStyle]}
+      style={[styles.container, isSearch ? styles.expandedStyle : styles.clapsedStyle]}
     >
-      {isExpanded ? (
+      {isSearch ? (
         <TextInput
           ref={inputRef}
           placeholder="input to search"

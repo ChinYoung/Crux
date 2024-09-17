@@ -37,11 +37,13 @@ export const Home: FC<NativeStackScreenProps<RootStackParamList, 'Home'>> = ({ n
   const { dbConn } = useContext(globalContext);
   const [allGroups, setAllGroups] = useState<EGroup[]>([]);
   const [isExpanded, setIsExpanded] = useState<boolean>(false);
+  const [isSearch, setIsSearch] = useState<boolean>(false);
 
   const searchInputWidth = useSharedValue(40);
 
   const updateIsExpanded = useCallback(() => {
     setIsExpanded(searchInputWidth.value === EXPAND_WIDTH);
+    setIsSearch(searchInputWidth.value === EXPAND_WIDTH);
   }, [searchInputWidth.value]);
 
   const animatedSearchStyle = useAnimatedStyle(
@@ -80,7 +82,7 @@ export const Home: FC<NativeStackScreenProps<RootStackParamList, 'Home'>> = ({ n
   }, [refresh, navigation]);
 
   const expandToSearch = useCallback(() => {
-    setIsExpanded(true);
+    setIsSearch(true);
     searchInputWidth.value = EXPAND_WIDTH;
   }, [searchInputWidth]);
 
@@ -102,13 +104,17 @@ export const Home: FC<NativeStackScreenProps<RootStackParamList, 'Home'>> = ({ n
         {/* footer */}
         <View style={[styles.footer]}>
           <Animated.View style={[animatedSearchStyle]}>
-            <SearchInput onFocus={expandToSearch} onFold={foldSearch} isExpanded={isExpanded} />
+            <SearchInput onFocus={expandToSearch} onFold={foldSearch} isSearch={isSearch} />
           </Animated.View>
           <View style={[styles.filterIcon]}>
             <FontAwesomeIcon icon={faFilter} />
           </View>
           <View style={{ flex: 1 }}>
-            <PrimaryButton pressHandler={toAddPage} name="Create" />
+            {isExpanded ? (
+              <PrimaryButton pressHandler={toAddPage} name="Search" />
+            ) : (
+              <PrimaryButton pressHandler={toAddPage} name="Create" />
+            )}
           </View>
         </View>
       </View>
