@@ -1,7 +1,10 @@
 import 'react-native-get-random-values';
 import { nanoid } from 'nanoid';
 import { FC, useCallback } from 'react';
-import { StyleSheet, TextInput, View } from 'react-native';
+import { Pressable, StyleSheet, TextInput, View } from 'react-native';
+import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
+import { faTrash } from '@fortawesome/free-solid-svg-icons';
+import { confirmHof } from '../utils/hof';
 
 export type CustomField = {
   extendItemId: string;
@@ -25,12 +28,6 @@ export function createExtendField() {
   };
 }
 
-export type FieldFunctions = {
-  updateLabel: (id: string, newLabel: string) => void;
-  updateContent: (id: string, newContent: string) => void;
-  validate?: (id: string, label: string, content: string) => void;
-};
-
 const styles = StyleSheet.create({
   root: {
     width: '100%',
@@ -42,6 +39,11 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     paddingVertical: 8,
     paddingHorizontal: 8,
+  },
+  deleteIcon: {
+    position: 'absolute',
+    top: 8,
+    right: 8,
   },
   labelContainer: {
     borderBottomColor: 'black',
@@ -59,6 +61,13 @@ const styles = StyleSheet.create({
   },
 });
 
+export type FieldFunctions = {
+  updateLabel: (id: string, newLabel: string) => void;
+  updateContent: (id: string, newContent: string) => void;
+  validate?: (id: string, label: string, content: string) => void;
+  deleteField: (id: string) => void;
+};
+
 export const FieldEditor: FC<CustomField & FieldFunctions> = ({
   extendItemId: itemId,
   name,
@@ -67,6 +76,7 @@ export const FieldEditor: FC<CustomField & FieldFunctions> = ({
   contentError,
   updateContent,
   updateLabel,
+  deleteField,
   validate,
 }) => {
   const onInputLabel = useCallback(
@@ -81,8 +91,16 @@ export const FieldEditor: FC<CustomField & FieldFunctions> = ({
     },
     [itemId, updateContent],
   );
+  const onDelete = useCallback(() => {
+    deleteField(itemId);
+  }, [deleteField, itemId]);
   return (
     <View style={[styles.root]}>
+      <View style={[styles.deleteIcon]}>
+        <Pressable onPress={confirmHof(onDelete)}>
+          <FontAwesomeIcon color="red" icon={faTrash} />
+        </Pressable>
+      </View>
       <View style={[styles.labelContainer]}>
         <TextInput
           placeholder="Input Field Name Here"

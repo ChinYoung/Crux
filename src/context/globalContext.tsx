@@ -2,7 +2,7 @@ import { FC, PropsWithChildren, createContext, useCallback, useEffect, useState 
 import { DataSource } from 'typeorm/browser';
 
 import { Db } from '../lib/Db';
-import datasource from '../lib/datasource';
+import { getDataSource } from '../lib/datasource';
 import { ClickOutsideProvider } from 'react-native-click-outside';
 import { PortalProvider } from '@gorhom/portal';
 
@@ -29,10 +29,16 @@ export const GlobalContextProvider: FC<PropsWithChildren> = ({ children }) => {
   }, []);
 
   useEffect(() => {
-    Db.init(datasource).then(() => {
-      setDbConn(Db.conn);
-    });
-  }, []);
+    if (!dbConn) {
+      Db.init(getDataSource())
+        .then(() => {
+          setDbConn(Db.conn);
+        })
+        .catch((err) => {
+          console.log('🚀 ~ Db.init ~ err:', err);
+        });
+    }
+  }, [dbConn]);
 
   return (
     <globalContext.Provider value={{ dbConn, isLoading, loading }}>

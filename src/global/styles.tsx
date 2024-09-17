@@ -6,4 +6,8 @@ export const GlobalStyles = StyleSheet.create({
     borderStyle: 'solid',
     borderWidth: 1,
   },
+  description: {
+    fontSize: 12,
+    opacity: 0.4,
+  },
 });

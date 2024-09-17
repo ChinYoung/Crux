@@ -10,7 +10,7 @@ import {
   useState,
 } from 'react';
 import { RootStackParamList } from '../route/Router';
-import { Text, View } from 'react-native';
+import { Pressable, Text, View } from 'react-native';
 import { globalContext } from '../context/globalContext';
 import { StyleSheet } from 'react-native';
 import { EExtendItem } from '../entities/EExtendItem';
@@ -22,6 +22,10 @@ import { AddFieldButton } from '../components/AddFieldButton';
 import { CustomInput } from '../components/CustomInput';
 import { EGroup } from '../entities/EGroup';
 import { nanoid } from 'nanoid';
+import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
+import { faTrash } from '@fortawesome/free-solid-svg-icons';
+import { confirmHof } from '../utils/hof';
+import { GlobalStyles } from '../global/styles';
 
 function createBlankAccount() {
   const defaultAccount = new EAccount();
@@ -55,15 +59,7 @@ const styles = StyleSheet.create({
     padding: 12,
     display: 'flex',
     flexDirection: 'column',
-    gap: 16,
-  },
-  descContainer: {
-    paddingBottom: 16,
-  },
-  description: {
-    fontSize: 12,
-    opacity: 0.6,
-    paddingLeft: 8,
+    gap: 8,
   },
   keyValueContainer: {
     paddingVertical: 4,
@@ -152,6 +148,13 @@ const AccountForm = forwardRef<any, FormProps>(({ account, isEditing = true }, r
     [extendedItems],
   );
 
+  const deleteField = useCallback(
+    (id: string) => {
+      setExtendedItems(extendedItems.filter((i) => i.extendItemId !== id));
+    },
+    [extendedItems],
+  );
+
   const addNewField = useCallback(() => {
     const { newExtendItem } = createExtendField();
     setExtendedItems([...extendedItems, newExtendItem] as EExtendItem[]);
@@ -176,8 +179,8 @@ const AccountForm = forwardRef<any, FormProps>(({ account, isEditing = true }, r
           <CustomInput multiple={true} onChange={setDesc} value={desc} />
         </View>
       ) : (
-        <View style={styles.descContainer}>
-          <Text style={styles.description}>{account?.desc}</Text>
+        <View>
+          <Text style={GlobalStyles.description}>{account?.desc}</Text>
         </View>
       )}
       {extendedItems.map((_e) => {
@@ -189,6 +192,7 @@ const AccountForm = forwardRef<any, FormProps>(({ account, isEditing = true }, r
             content={_e.content}
             updateContent={updateField}
             updateLabel={updateLabel}
+            deleteField={deleteField}
           />
         ) : (
           <LocalKeyValue key={_e.extendItemId} keyName={_e.name} value={_e.content} />
@@ -354,21 +358,16 @@ export const AccountDetail: FC<NativeStackScreenProps<RootStackParamList, 'Accou
     navigation.goBack();
   }, [accountId, dbConn?.manager, navigation]);
 
-  const confirmToDelete = useCallback(() => {
-    Alert.alert('Warning', 'Confirm to delete?', [
-      {
-        text: 'Cancel',
-      },
-      {
-        text: 'Confirm',
-        onPress: deleteAccount,
-      },
-    ]);
-  }, [deleteAccount]);
-
   useEffect(() => {
-    navigation.setOptions({ title: name });
-  }, [name, navigation]);
+    navigation.setOptions({
+      title: name,
+      headerRight: () => (
+        <Pressable onPress={confirmHof(deleteAccount)}>
+          <FontAwesomeIcon color="red" icon={faTrash} />
+        </Pressable>
+      ),
+    });
+  }, [deleteAccount, name, navigation]);
 
   useEffect(() => {
     refresh();

@@ -73,7 +73,7 @@ export const CreateGroup: FC<NativeStackScreenProps<RootStackParamList, 'AddGrou
 
   const addGroup = useCallback(async () => {
     if (!dbConn) {
-      Alert.alert('error');
+      Alert.alert('no db connection');
       return;
     }
     if (!newName) {

@@ -1,6 +1,6 @@
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { FC, useCallback, useContext, useEffect, useState } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, Text, Vibration, View } from 'react-native';
 import { RootStackParamList } from '../route/Router';
 import { EGroup } from '../entities/EGroup';
 import { globalContext } from '../context/globalContext';
@@ -9,6 +9,7 @@ import { PrimaryButton } from '../components/Button';
 import { HeaderRightMenu } from '../components/HeaderRightMenu';
 import { PortalHost } from '@gorhom/portal';
 import { SafeWithHeaderKeyboardAvoidingView } from '../components/SafeWithHeaderKeyboardAvoidingView';
+import { GlobalStyles } from '../global/styles';
 
 export const GroupDetail: FC<NativeStackScreenProps<RootStackParamList, 'GroupDetail'>> = ({
   route,
@@ -47,33 +48,38 @@ export const GroupDetail: FC<NativeStackScreenProps<RootStackParamList, 'GroupDe
     [navigation],
   );
 
+  const showMenu = useCallback((accountId: string) => {
+    console.log('🚀 ~ showMenu ~ accountId:', accountId);
+    Vibration.vibrate();
+  }, []);
+
   useEffect(() => {
-    navigation.setOptions({
-      headerRight() {
-        return (
-          <HeaderRightMenu
-            title="Menux"
-            menuItems={[
-              {
-                id: '1',
-                name: 'sub menu 1',
-                handler: () => console.log('sub menu 1'),
-              },
-              {
-                id: '2',
-                name: 'sub menu 2',
-                handler: () => console.log('sub menu 2'),
-              },
-              {
-                id: '3',
-                name: 'sub menu 3',
-                handler: () => console.log('sub menu 3'),
-              },
-            ]}
-          />
-        );
-      },
-    });
+    // navigation.setOptions({
+    //   headerRight() {
+    //     return (
+    //       <HeaderRightMenu
+    //         title="Menux"
+    //         menuItems={[
+    //           {
+    //             id: '1',
+    //             name: 'sub menu 1',
+    //             handler: () => console.log('sub menu 1'),
+    //           },
+    //           {
+    //             id: '2',
+    //             name: 'sub menu 2',
+    //             handler: () => console.log('sub menu 2'),
+    //           },
+    //           {
+    //             id: '3',
+    //             name: 'sub menu 3',
+    //             handler: () => console.log('sub menu 3'),
+    //           },
+    //         ]}
+    //       />
+    //     );
+    //   },
+    // });
     navigation.addListener('focus', refresh);
     refresh();
     return () => navigation.removeListener('focus', refresh);
@@ -85,21 +91,21 @@ export const GroupDetail: FC<NativeStackScreenProps<RootStackParamList, 'GroupDe
     });
   }, [navigation, group?.name]);
 
-  console.log();
-
   return (
     <>
       {group ? (
         <SafeWithHeaderKeyboardAvoidingView>
           <View style={[styles.container]}>
             <PortalHost name="subMenu" />
-            {/* <Text>{tag.tagId}</Text> */}
-            {/* <Text style={styles.title}>{tag.name}</Text> */}
-            <Text style={styles.descriptionContent}>{group.desc}</Text>
-            {/* <View style={styles.divider} /> */}
+            <Text style={GlobalStyles.description}>{group.desc}</Text>
             <View style={styles.contentWrapper}>
               {group.accountList.map((i) => (
-                <AccountItem key={i.id} account={i} toAccountDetail={toAccountDetail} />
+                <AccountItem
+                  key={i.id}
+                  account={i}
+                  toAccountDetail={toAccountDetail}
+                  showMenu={showMenu}
+                />
               ))}
             </View>
             <PrimaryButton pressHandler={toAddItem} name="Create" />
@@ -115,9 +121,13 @@ export const GroupDetail: FC<NativeStackScreenProps<RootStackParamList, 'GroupDe
 const AccountItem: FC<{
   account: EAccount;
   toAccountDetail: (itemId: string, name: string) => void;
-}> = ({ account: { name, accountId }, toAccountDetail }) => {
+  showMenu: (itemId: string) => void;
+}> = ({ account: { name, accountId }, toAccountDetail, showMenu }) => {
   return (
-    <Pressable onPress={() => toAccountDetail(accountId, name)}>
+    <Pressable
+      onPress={() => toAccountDetail(accountId, name)}
+      onLongPress={() => showMenu(accountId)}
+    >
       <View style={AccountStyles.container}>
         <Text style={AccountStyles.name}>{name}</Text>
         <Text numberOfLines={1} style={[AccountStyles.account]}>
@@ -137,6 +147,7 @@ const styles = StyleSheet.create({
     paddingBottom: 16,
     display: 'flex',
     justifyContent: 'flex-start',
+    gap: 8,
   },
   title: {
     fontSize: 32,
@@ -148,7 +159,7 @@ const styles = StyleSheet.create({
   },
   descriptionContent: {
     opacity: 0.6,
-    padding: 4,
+    padding: 8,
     fontSize: 10,
     color: '#005485',
   },
@@ -161,7 +172,6 @@ const styles = StyleSheet.create({
   },
   contentWrapper: {
     borderRadius: 10,
-    padding: 8,
     display: 'flex',
     gap: 4,
     flex: 1,
