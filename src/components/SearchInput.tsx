@@ -6,7 +6,6 @@ import { LIGHT_DEFAULT_COLOR } from '../theme/color';
 
 const styles = StyleSheet.create({
   container: {
-    padding: 6,
     height: 40,
     display: 'flex',
     justifyContent: 'center',
@@ -15,6 +14,7 @@ const styles = StyleSheet.create({
     borderStyle: 'solid',
     borderWidth: 1,
     borderColor: LIGHT_DEFAULT_COLOR.button.postive,
+    paddingHorizontal: 8,
   },
   expandedStyle: {
     width: '100%',

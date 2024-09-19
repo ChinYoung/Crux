@@ -50,14 +50,14 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderStyle: 'solid',
     width: '65%',
-    paddingVertical: 4,
   },
   inputContainer: {
     borderStyle: 'solid',
     borderBottomColor: 'black',
     borderBottomWidth: 1,
-    paddingVertical: 8,
-    paddingHorizontal: 4,
+  },
+  input: {
+    height: 36,
   },
 });
 
@@ -103,6 +103,7 @@ export const FieldEditor: FC<CustomField & FieldFunctions> = ({
       </View>
       <View style={[styles.labelContainer]}>
         <TextInput
+          style={[styles.input]}
           placeholder="Input Field Name Here"
           onChangeText={onInputLabel}
           value={name}
@@ -111,6 +112,7 @@ export const FieldEditor: FC<CustomField & FieldFunctions> = ({
       </View>
       <View style={[styles.inputContainer]}>
         <TextInput
+          style={[styles.input]}
           placeholder="Input Field Value Here"
           value={content}
           onChangeText={onInputContent}

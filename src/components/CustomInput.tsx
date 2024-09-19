@@ -1,12 +1,4 @@
-import {
-  FC,
-  ForwardRefRenderFunction,
-  Ref,
-  RefObject,
-  forwardRef,
-  useCallback,
-  useState,
-} from 'react';
+import { ForwardRefRenderFunction, forwardRef, useCallback, useState } from 'react';
 import {
   NativeSyntheticEvent,
   StyleSheet,
@@ -17,24 +9,20 @@ import {
 
 const styles = StyleSheet.create({
   inputContainer: {
-    display: 'flex',
     borderStyle: 'solid',
     borderColor: '#ccc',
     borderWidth: 1,
     borderRadius: 4,
-    minHeight: 36,
-    paddingVertical: 8,
-    paddingHorizontal: 4,
-  },
-  multipleInputContainer: {
-    minHeight: 76,
-  },
-  input: {
-    flex: 1,
   },
   activated: {
     borderColor: '#99f',
     borderWidth: 2,
+  },
+  input: {
+    height: 36,
+  },
+  multipleInput: {
+    height: 72,
   },
 });
 const CustomInputComponent: ForwardRefRenderFunction<
@@ -55,16 +43,10 @@ const CustomInputComponent: ForwardRefRenderFunction<
     setIsActivated(false);
   }, []);
   return (
-    <View
-      style={[
-        styles.inputContainer,
-        multiple ? styles.multipleInputContainer : null,
-        isActivated ? styles.activated : null,
-      ]}
-    >
+    <View style={[styles.inputContainer, isActivated ? styles.activated : null]}>
       <TextInput
+        style={[multiple ? styles.multipleInput : styles.input]}
         ref={ref}
-        style={styles.input}
         multiline={multiple}
         autoCapitalize="none"
         onChange={onChangeHandler}
