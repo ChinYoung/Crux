@@ -15,6 +15,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: LIGHT_DEFAULT_COLOR.button.postive,
     paddingHorizontal: 8,
+    width: '100%',
   },
   expandedStyle: {
     width: '100%',
@@ -49,10 +50,7 @@ export const SearchInput: FC<{ onFocus: () => void; onFold: () => void; isSearch
     }
   }, [inputRef, isSearch]);
   return (
-    <Pressable
-      onPress={expandToSearch}
-      style={[styles.container, isSearch ? styles.expandedStyle : styles.clapsedStyle]}
-    >
+    <Pressable onPress={expandToSearch} style={[styles.container]}>
       {isSearch ? (
         <TextInput
           ref={inputRef}
