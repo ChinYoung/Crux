@@ -17,10 +17,11 @@ import { RootStackParamList } from './src/route/Router';
 import { GroupDetail } from './src/pages/GroupDetail';
 import { AccountDetail, AddAccount } from './src/pages/AccountDetail';
 import { LIGHT_DEFAULT_COLOR } from './src/theme/color';
-
+import Constants from 'expo-constants';
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
 function App(): JSX.Element {
+  console.log('------------', Constants.deviceName);
   return (
     <NavigationContainer
       theme={{

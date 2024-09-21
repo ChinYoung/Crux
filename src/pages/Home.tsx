@@ -29,6 +29,7 @@ import { SearchInput } from '../components/SearchInput';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faFilter } from '@fortawesome/free-solid-svg-icons';
 import { LIGHT_DEFAULT_COLOR } from '../theme/color';
+import { GlobalStyles } from '../global/styles';
 
 const EXPAND_WIDTH = 160;
 const CLAPSED_WIDTH = 40;
@@ -43,7 +44,6 @@ export const Home: FC<NativeStackScreenProps<RootStackParamList, 'Home'>> = ({ n
 
   const updateIsExpanded = useCallback(() => {
     setIsExpanded(searchInputWidth.value === EXPAND_WIDTH);
-    setIsSearch(searchInputWidth.value === EXPAND_WIDTH);
   }, [searchInputWidth.value]);
 
   const animatedSearchStyle = useAnimatedStyle(
@@ -87,12 +87,13 @@ export const Home: FC<NativeStackScreenProps<RootStackParamList, 'Home'>> = ({ n
   }, [searchInputWidth]);
 
   const foldSearch = useCallback(() => {
+    setIsSearch(false);
     searchInputWidth.value = CLAPSED_WIDTH;
   }, [searchInputWidth]);
 
   return (
     <SafeWithHeaderKeyboardAvoidingView>
-      <View style={[styles.root]}>
+      <View style={[styles.root, GlobalStyles.debug]}>
         {/* content */}
         <Pressable onPress={Keyboard.dismiss} style={[styles.container]}>
           <View style={styles.contentWrapper}>
@@ -127,8 +128,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   root: {
-    flex: 1,
-    display: 'flex',
+    height: '100%',
     position: 'relative',
     width: '100%',
     padding: 8,
