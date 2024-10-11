@@ -10,7 +10,7 @@ import {
   useState,
 } from 'react';
 import { RootStackParamList } from '../route/Router';
-import { Pressable, Text, View } from 'react-native';
+import { Pressable, ScrollView, Text, View } from 'react-native';
 import { globalContext } from '../context/globalContext';
 import { StyleSheet } from 'react-native';
 import { EExtendItem } from '../entities/EExtendItem';
@@ -26,6 +26,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faTrash } from '@fortawesome/free-solid-svg-icons';
 import { confirmHof } from '../utils/hof';
 import { GlobalStyles } from '../global/styles';
+import { SafeWithHeaderKeyboardAvoidingView } from '../components/SafeWithHeaderKeyboardAvoidingView';
 
 function createBlankAccount() {
   const defaultAccount = new EAccount();
@@ -54,12 +55,11 @@ const styles = StyleSheet.create({
     display: 'flex',
     justifyContent: 'space-between',
     padding: 8,
+    gap: 20,
   },
   contentContainer: {
+    flex: 1,
     padding: 12,
-    display: 'flex',
-    flexDirection: 'column',
-    gap: 8,
   },
   keyValueContainer: {
     paddingVertical: 4,
@@ -166,7 +166,7 @@ const AccountForm = forwardRef<any, FormProps>(({ account, isEditing = true }, r
     setDesc(account.desc);
   }, [account.desc, account.extendedItems, account.name]);
   return (
-    <View style={styles.contentContainer}>
+    <ScrollView style={styles.contentContainer}>
       {isEditing ? (
         <View>
           <Text>Name</Text>
@@ -203,7 +203,7 @@ const AccountForm = forwardRef<any, FormProps>(({ account, isEditing = true }, r
           <AddFieldButton onClick={addNewField} />
         </View>
       )}
-    </View>
+    </ScrollView>
   );
 });
 
@@ -374,15 +374,17 @@ export const AccountDetail: FC<NativeStackScreenProps<RootStackParamList, 'Accou
   }, [refresh]);
 
   return (
-    <View style={styles.container}>
-      {item && <AccountForm account={item} isEditing={isEditing} ref={formRef} />}
-      {/* buttons on the bottom */}
-      <View style={styles.operations}>
-        <View style={styles.addExtentdButtonContainer}>
-          {isEditing && <PrimaryButton pressHandler={updateAccount} name="Save" />}
-          {!isEditing && <PrimaryButton pressHandler={startEdit} name="Edit" />}
+    <SafeWithHeaderKeyboardAvoidingView>
+      <View style={[styles.container, GlobalStyles.debug]}>
+        {item && <AccountForm account={item} isEditing={isEditing} ref={formRef} />}
+        {/* buttons on the bottom */}
+        <View style={styles.operations}>
+          <View style={styles.addExtentdButtonContainer}>
+            {isEditing && <PrimaryButton pressHandler={updateAccount} name="Save" />}
+            {!isEditing && <PrimaryButton pressHandler={startEdit} name="Edit" />}
+          </View>
         </View>
       </View>
-    </View>
+    </SafeWithHeaderKeyboardAvoidingView>
   );
 };

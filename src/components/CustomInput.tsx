@@ -23,6 +23,7 @@ const styles = StyleSheet.create({
   },
   multipleInput: {
     height: 72,
+    verticalAlign: 'top',
   },
 });
 const CustomInputComponent: ForwardRefRenderFunction<
