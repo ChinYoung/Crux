@@ -5,6 +5,8 @@
   "scripts": {
     "android": "react-native run-android",
     "ios": "react-native run-ios",
+    "expo:android": "npx expo run:android",
+    "expo:ios": "npx expo run:ios",
     "debug": "npx react-devtools",
     "lint": "eslint .",
     "start": "react-native start",
@@ -41,7 +43,8 @@
     "sqlite3": "^5.1.6",
     "typeorm": "^0.3.17",
     "expo": "^51.0.0",
-    "expo-constants": "~16.0.2"
+    "expo-constants": "~16.0.2",
+    "expo-device": "~6.0.2"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",
