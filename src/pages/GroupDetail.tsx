@@ -6,10 +6,12 @@ import { EGroup } from '../entities/EGroup';
 import { globalContext } from '../context/globalContext';
 import { EAccount } from '../entities/EAccount';
 import { PrimaryButton } from '../components/Button';
-import { HeaderRightMenu } from '../components/HeaderRightMenu';
 import { PortalHost } from '@gorhom/portal';
 import { SafeWithHeaderKeyboardAvoidingView } from '../components/SafeWithHeaderKeyboardAvoidingView';
 import { GlobalStyles } from '../global/styles';
+import { confirmHof } from '../utils/hof';
+import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
+import { faTrash } from '@fortawesome/free-solid-svg-icons';
 
 export const GroupDetail: FC<NativeStackScreenProps<RootStackParamList, 'GroupDetail'>> = ({
   route,
@@ -53,6 +55,18 @@ export const GroupDetail: FC<NativeStackScreenProps<RootStackParamList, 'GroupDe
     Vibration.vibrate();
   }, []);
 
+  const deleteGroup = useCallback(async () => {
+    const targetGroup = await dbConn?.manager.findOne(EGroup, {
+      where: { groupId: id },
+      relations: { accountList: true },
+    });
+    if (!targetGroup) {
+      return;
+    }
+    await dbConn?.manager.remove(targetGroup);
+    navigation.goBack();
+  }, [dbConn?.manager, id, navigation]);
+
   useEffect(() => {
     // navigation.setOptions({
     //   headerRight() {
@@ -88,8 +102,13 @@ export const GroupDetail: FC<NativeStackScreenProps<RootStackParamList, 'GroupDe
   useEffect(() => {
     navigation.setOptions({
       title: group?.name,
+      headerRight: () => (
+        <Pressable onPress={confirmHof(deleteGroup)}>
+          <FontAwesomeIcon color="red" icon={faTrash} />
+        </Pressable>
+      ),
     });
-  }, [navigation, group?.name]);
+  }, [navigation, group?.name, deleteGroup]);
 
   return (
     <>
