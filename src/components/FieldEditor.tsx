@@ -1,7 +1,7 @@
 import 'react-native-get-random-values';
 import { nanoid } from 'nanoid';
-import { FC, useCallback } from 'react';
-import { Pressable, StyleSheet, TextInput, View } from 'react-native';
+import { createRef, FC, Ref, RefObject, useCallback, useState } from 'react';
+import { Pressable, ScrollView, StyleSheet, TextInput, View } from 'react-native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faTrash } from '@fortawesome/free-solid-svg-icons';
 import { confirmHof } from '../utils/hof';
@@ -66,6 +66,8 @@ export type FieldFunctions = {
   updateContent: (id: string, newContent: string) => void;
   validate?: (id: string, label: string, content: string) => void;
   deleteField: (id: string) => void;
+  focusTo: (x: number) => void;
+  parent: RefObject<ScrollView>;
 };
 
 export const FieldEditor: FC<CustomField & FieldFunctions> = ({
@@ -78,7 +80,11 @@ export const FieldEditor: FC<CustomField & FieldFunctions> = ({
   updateLabel,
   deleteField,
   validate,
+  focusTo,
+  parent,
 }) => {
+  const containerRef = createRef<View>();
+
   const onInputLabel = useCallback(
     (text: string) => {
       updateLabel(itemId, text);
@@ -94,8 +100,26 @@ export const FieldEditor: FC<CustomField & FieldFunctions> = ({
   const onDelete = useCallback(() => {
     deleteField(itemId);
   }, [deleteField, itemId]);
+
+  const [y, setY] = useState(0);
+
+  const saveRectInfo = useCallback(() => {
+    if (!parent.current) {
+      return;
+    }
+    // type error here, but works
+    containerRef.current?.measureLayout(parent.current, (_left, top) => {
+      console.log('🚀 ~ containerRef.current?.measureLayout ~ top:', top);
+      setY(top);
+    });
+  }, [containerRef, parent]);
+
+  const focusToThis = useCallback(() => {
+    focusTo(y);
+  }, [focusTo, y]);
+
   return (
-    <View style={[styles.root]}>
+    <View style={[styles.root]} ref={containerRef} onLayout={saveRectInfo}>
       <View style={[styles.deleteIcon]}>
         <Pressable onPress={confirmHof(onDelete)}>
           <FontAwesomeIcon color="red" icon={faTrash} />
@@ -108,6 +132,7 @@ export const FieldEditor: FC<CustomField & FieldFunctions> = ({
           onChangeText={onInputLabel}
           value={name}
           autoCapitalize="none"
+          onFocus={focusToThis}
         />
       </View>
       <View style={[styles.inputContainer]}>
@@ -117,6 +142,7 @@ export const FieldEditor: FC<CustomField & FieldFunctions> = ({
           value={content}
           onChangeText={onInputContent}
           autoCapitalize="none"
+          onFocus={focusToThis}
         />
       </View>
     </View>
