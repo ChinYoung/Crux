@@ -1,5 +1,6 @@
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import {
+  createRef,
   FC,
   forwardRef,
   useCallback,
@@ -58,8 +59,8 @@ const styles = StyleSheet.create({
     gap: 20,
   },
   contentContainer: {
-    flex: 1,
     padding: 12,
+    rowGap: 12,
   },
   keyValueContainer: {
     paddingVertical: 4,
@@ -114,6 +115,8 @@ const AccountForm = forwardRef<any, FormProps>(({ account, isEditing = true }, r
   const [name, setName] = useState<string>('');
   const [desc, setDesc] = useState<string>('');
   const [extendedItems, setExtendedItems] = useState<EExtendItem[]>([]);
+  const containerRef = createRef<ScrollView | null>();
+
   useImperativeHandle(ref, () => {
     return {
       getValues() {
@@ -158,7 +161,15 @@ const AccountForm = forwardRef<any, FormProps>(({ account, isEditing = true }, r
   const addNewField = useCallback(() => {
     const { newExtendItem } = createExtendField();
     setExtendedItems([...extendedItems, newExtendItem] as EExtendItem[]);
-  }, [extendedItems]);
+    containerRef.current?.scrollToEnd();
+  }, [containerRef, extendedItems]);
+
+  const focusTo = useCallback(
+    (top: number) => {
+      containerRef.current?.scrollTo({ y: top });
+    },
+    [containerRef],
+  );
 
   useEffect(() => {
     setExtendedItems(account.extendedItems);
@@ -166,7 +177,7 @@ const AccountForm = forwardRef<any, FormProps>(({ account, isEditing = true }, r
     setDesc(account.desc);
   }, [account.desc, account.extendedItems, account.name]);
   return (
-    <ScrollView style={styles.contentContainer}>
+    <ScrollView ref={containerRef} contentContainerStyle={styles.contentContainer}>
       {isEditing ? (
         <View>
           <Text>Name</Text>
@@ -186,6 +197,8 @@ const AccountForm = forwardRef<any, FormProps>(({ account, isEditing = true }, r
       {extendedItems.map((_e) => {
         return isEditing ? (
           <FieldEditor
+            parent={containerRef}
+            focusTo={focusTo}
             key={_e.extendItemId}
             extendItemId={_e.extendItemId}
             name={_e.name}
