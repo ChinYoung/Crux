@@ -60,7 +60,11 @@ function App(): JSX.Element {
               },
             }}
           />
-          <Stack.Screen name="AddItem" component={AddAccount} options={{ presentation: 'modal' }} />
+          <Stack.Screen
+            name="AddAccount"
+            component={AddAccount}
+            options={{ presentation: 'modal' }}
+          />
           <Stack.Screen
             name="GroupDetail"
             component={GroupDetail}

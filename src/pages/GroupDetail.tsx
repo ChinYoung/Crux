@@ -27,7 +27,7 @@ export const GroupDetail: FC<NativeStackScreenProps<RootStackParamList, 'GroupDe
     if (!group) {
       return;
     }
-    navigation.navigate('AddItem', { groupId: group.groupId, name: group.name });
+    navigation.navigate('AddAccount', { groupId: group.groupId });
   }, [navigation, group]);
 
   const refresh = useCallback(() => {
@@ -44,14 +44,13 @@ export const GroupDetail: FC<NativeStackScreenProps<RootStackParamList, 'GroupDe
   }, [dbConn, id]);
 
   const toAccountDetail = useCallback(
-    (accountId: string, name: string) => {
-      navigation.navigate('AccountDetail', { accountId, name });
+    (accountId: string) => {
+      navigation.navigate('AccountDetail', { accountId });
     },
     [navigation],
   );
 
-  const showMenu = useCallback((accountId: string) => {
-    console.log('🚀 ~ showMenu ~ accountId:', accountId);
+  const showMenu = useCallback(() => {
     Vibration.vibrate();
   }, []);
 

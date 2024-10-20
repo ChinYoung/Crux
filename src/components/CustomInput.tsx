@@ -11,12 +11,11 @@ const styles = StyleSheet.create({
   inputContainer: {
     borderStyle: 'solid',
     borderColor: '#ccc',
-    borderWidth: 1,
     borderRadius: 4,
+    borderWidth: 1,
   },
   activated: {
     borderColor: '#99f',
-    borderWidth: 2,
   },
   input: {
     height: 36,
@@ -26,11 +25,18 @@ const styles = StyleSheet.create({
     verticalAlign: 'top',
   },
 });
-const CustomInputComponent: ForwardRefRenderFunction<
-  TextInput,
-  { value?: string; multiple: boolean; onChange: (val: string) => void }
-> = ({ onChange, multiple, value }, ref) => {
+
+type CustomInputProps = {
+  value?: string;
+  multiple: boolean;
+  onChange: (val: string) => void;
+};
+const CustomInputComponent: ForwardRefRenderFunction<TextInput, CustomInputProps> = (
+  { onChange, multiple, value },
+  ref,
+) => {
   const [isActivated, setIsActivated] = useState(false);
+
   const onChangeHandler = useCallback(
     (_e: NativeSyntheticEvent<TextInputChangeEventData>) => {
       onChange(_e.nativeEvent.text);
@@ -43,6 +49,7 @@ const CustomInputComponent: ForwardRefRenderFunction<
   const deactivate = useCallback(() => {
     setIsActivated(false);
   }, []);
+
   return (
     <View style={[styles.inputContainer, isActivated ? styles.activated : null]}>
       <TextInput

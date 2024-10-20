@@ -11,7 +11,7 @@ import {
   useState,
 } from 'react';
 import { RootStackParamList } from '../route/Router';
-import { Pressable, ScrollView, Text, View } from 'react-native';
+import { Pressable, ScrollView, Text, TextInput, View } from 'react-native';
 import { globalContext } from '../context/globalContext';
 import { StyleSheet } from 'react-native';
 import { EExtendItem } from '../entities/EExtendItem';
@@ -28,6 +28,7 @@ import { faTrash } from '@fortawesome/free-solid-svg-icons';
 import { confirmHof } from '../utils/hof';
 import { GlobalStyles } from '../global/styles';
 import { SafeWithHeaderKeyboardAvoidingView } from '../components/SafeWithHeaderKeyboardAvoidingView';
+import { useAccountCurd } from '../hooks/useAccount';
 
 function createBlankAccount() {
   const defaultAccount = new EAccount();
@@ -115,7 +116,9 @@ const AccountForm = forwardRef<any, FormProps>(({ account, isEditing = true }, r
   const [name, setName] = useState<string>('');
   const [desc, setDesc] = useState<string>('');
   const [extendedItems, setExtendedItems] = useState<EExtendItem[]>([]);
-  const containerRef = createRef<ScrollView | null>();
+
+  const containerRef = createRef<ScrollView>();
+  const nameInputRef = createRef<TextInput>();
 
   useImperativeHandle(ref, () => {
     return {
@@ -123,7 +126,7 @@ const AccountForm = forwardRef<any, FormProps>(({ account, isEditing = true }, r
         return {
           name,
           desc,
-          extendedItems,
+          extendedItems: extendedItems.filter((i) => !!i.name),
         };
       },
     };
@@ -161,27 +164,39 @@ const AccountForm = forwardRef<any, FormProps>(({ account, isEditing = true }, r
   const addNewField = useCallback(() => {
     const { newExtendItem } = createExtendField();
     setExtendedItems([...extendedItems, newExtendItem] as EExtendItem[]);
-    containerRef.current?.scrollToEnd();
+    containerRef.current?.scrollToEnd({ animated: true });
   }, [containerRef, extendedItems]);
-
-  const focusTo = useCallback(
-    (top: number) => {
-      containerRef.current?.scrollTo({ y: top });
-    },
-    [containerRef],
-  );
 
   useEffect(() => {
     setExtendedItems(account.extendedItems);
     setName(account.name);
     setDesc(account.desc);
   }, [account.desc, account.extendedItems, account.name]);
+
+  const [oneTimeToggle, setOnetimeToggle] = useState<boolean>();
+
+  useEffect(() => {
+    if (!isEditing) {
+      setOnetimeToggle(false);
+      return;
+    }
+    if (!oneTimeToggle) {
+      containerRef.current?.scrollTo({ y: 0, animated: true });
+      nameInputRef.current?.focus();
+      setOnetimeToggle(true);
+    }
+  }, [containerRef, isEditing, nameInputRef, oneTimeToggle]);
+
   return (
-    <ScrollView ref={containerRef} contentContainerStyle={styles.contentContainer}>
+    <ScrollView
+      ref={containerRef}
+      contentContainerStyle={styles.contentContainer}
+      keyboardShouldPersistTaps="always"
+    >
       {isEditing ? (
         <View>
           <Text>Name</Text>
-          <CustomInput multiple={false} onChange={setName} value={name} />
+          <CustomInput multiple={false} onChange={setName} value={name} ref={nameInputRef} />
         </View>
       ) : null}
       {isEditing ? (
@@ -197,8 +212,6 @@ const AccountForm = forwardRef<any, FormProps>(({ account, isEditing = true }, r
       {extendedItems.map((_e) => {
         return isEditing ? (
           <FieldEditor
-            parent={containerRef}
-            focusTo={focusTo}
             key={_e.extendItemId}
             extendItemId={_e.extendItemId}
             name={_e.name}
@@ -220,12 +233,12 @@ const AccountForm = forwardRef<any, FormProps>(({ account, isEditing = true }, r
   );
 });
 
-export const AddAccount: FC<NativeStackScreenProps<RootStackParamList, 'AddItem'>> = ({
+export const AddAccount: FC<NativeStackScreenProps<RootStackParamList, 'AddAccount'>> = ({
   navigation,
   route,
 }) => {
   const { dbConn } = useContext(globalContext);
-  const { groupId, name } = route.params;
+  const { accountId: groupId } = route.params;
   const [item, setItem] = useState<EAccount>();
   const formRef = useRef<{ getValues: () => EAccount }>();
 
@@ -279,7 +292,7 @@ export const AddAccount: FC<NativeStackScreenProps<RootStackParamList, 'AddItem'
     navigation.setOptions({
       title: `Add an item to group: ${name}`,
     });
-  }, [name, navigation]);
+  }, [navigation]);
   return (
     <View style={styles.container}>
       {item && <AccountForm account={item} ref={formRef} />}
@@ -292,9 +305,7 @@ export const AccountDetail: FC<NativeStackScreenProps<RootStackParamList, 'Accou
   navigation,
   route,
 }) => {
-  const { dbConn } = useContext(globalContext);
-  const { accountId, name } = route.params;
-  const [item, setItem] = useState<EAccount>();
+  const { accountId } = route.params;
   const [isEditing, setIsEditing] = useState<boolean>(false);
   const formRef = useRef<{ getValues: () => EAccount }>();
 
@@ -302,98 +313,41 @@ export const AccountDetail: FC<NativeStackScreenProps<RootStackParamList, 'Accou
     setIsEditing(true);
   }, []);
 
-  const getAccountDetail = useCallback(
-    async (id: string) => {
-      const res = await dbConn?.manager.findOne(EAccount, {
-        where: { accountId: id },
-        relations: { extendedItems: true },
-      });
-      return res;
-    },
-    [dbConn?.manager],
-  );
+  const { account, createNewAccount, deleteAccount, refresh, setAccount, updateAccount } =
+    useAccountCurd(accountId);
 
-  const refresh = useCallback(async () => {
-    if (!accountId) {
-      return;
-    }
-    const account = await getAccountDetail(accountId);
-    if (!account) {
-      return;
-    }
-    setItem(account);
-  }, [accountId, getAccountDetail]);
-
-  const updateAccount = useCallback(() => {
+  const update = useCallback(async () => {
     const values = formRef.current?.getValues();
-    if (!dbConn?.manager) {
-      return;
-    }
     if (!values) {
       return;
     }
-    const newAccount = dbConn.manager.create(EAccount, {
-      ...item,
-      ...values,
-    });
-    newAccount.extendedItems = values.extendedItems.map((i) => {
-      if (i.id) {
-        const extendedItem = dbConn.manager.create(EExtendItem, i);
-        return extendedItem;
-      }
-      return dbConn.manager.create(EExtendItem, {
-        extendItemId: i.extendItemId,
-        name: i.name,
-        content: i.content,
-      });
-    }) as EExtendItem[];
+    await updateAccount(values);
+  }, [updateAccount]);
 
-    dbConn.manager
-      .save<EAccount>(newAccount)
-      .then(() => {
-        refresh();
-        setIsEditing(false);
-      })
-      .catch((err) => {
-        console.log('🚀 ~ dbConn.manager.save ~ err:', err);
-      });
-  }, [dbConn, item, refresh]);
-
-  const deleteAccount = useCallback(async () => {
-    const targetAccount = await dbConn?.manager.findOne(EAccount, {
-      where: { accountId },
-      relations: { extendedItems: true },
-    });
-    if (!targetAccount) {
-      return;
-    }
-    await dbConn?.manager.remove(targetAccount);
+  const deleteSelf = useCallback(async () => {
+    await deleteAccount();
     navigation.goBack();
-  }, [accountId, dbConn?.manager, navigation]);
+  }, [deleteAccount, navigation]);
 
   useEffect(() => {
     navigation.setOptions({
-      title: name,
+      title: account?.name,
       headerRight: () => (
-        <Pressable onPress={confirmHof(deleteAccount)}>
+        <Pressable onPress={confirmHof(deleteSelf)}>
           <FontAwesomeIcon color="red" icon={faTrash} />
         </Pressable>
       ),
     });
-  }, [deleteAccount, name, navigation]);
-
-  useEffect(() => {
-    refresh();
-  }, [refresh]);
+  }, [deleteSelf, account?.name, navigation]);
 
   return (
     <SafeWithHeaderKeyboardAvoidingView>
       <View style={[styles.container, GlobalStyles.debug]}>
-        {item && <AccountForm account={item} isEditing={isEditing} ref={formRef} />}
+        {account && <AccountForm account={account} isEditing={isEditing} ref={formRef} />}
         {/* buttons on the bottom */}
         <View style={styles.operations}>
           <View style={styles.addExtentdButtonContainer}>
-            {isEditing && <PrimaryButton pressHandler={updateAccount} name="Save" />}
+            {isEditing && <PrimaryButton pressHandler={update} name="Save" />}
             {!isEditing && <PrimaryButton pressHandler={startEdit} name="Edit" />}
           </View>
         </View>
