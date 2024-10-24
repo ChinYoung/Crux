@@ -30,15 +30,7 @@ import { GlobalStyles } from '../global/styles';
 import { SafeWithHeaderKeyboardAvoidingView } from '../components/SafeWithHeaderKeyboardAvoidingView';
 import { useAccountCurd } from '../hooks/useAccount';
 
-function createBlankAccount() {
-  const defaultAccount = new EAccount();
-  defaultAccount.desc = '';
-  const { newExtendItem } = createExtendField();
-  defaultAccount.extendedItems = [newExtendItem] as EExtendItem[];
-  return defaultAccount;
-}
-
-type FormProps = { account: EAccount; isEditing?: boolean };
+type FormProps = { defaultAccount?: EAccount; isEditing?: boolean };
 
 const LocalKeyValue: FC<{ keyName: string; value: string }> = ({ keyName: key, value }) => (
   <View style={styles.keyValueContainer}>
@@ -112,7 +104,7 @@ const styles = StyleSheet.create({
   },
 });
 
-const AccountForm = forwardRef<any, FormProps>(({ account, isEditing = true }, ref) => {
+const AccountForm = forwardRef<any, FormProps>(({ defaultAccount, isEditing = true }, ref) => {
   const [name, setName] = useState<string>('');
   const [desc, setDesc] = useState<string>('');
   const [extendedItems, setExtendedItems] = useState<EExtendItem[]>([]);
@@ -168,10 +160,10 @@ const AccountForm = forwardRef<any, FormProps>(({ account, isEditing = true }, r
   }, [containerRef, extendedItems]);
 
   useEffect(() => {
-    setExtendedItems(account.extendedItems);
-    setName(account.name);
-    setDesc(account.desc);
-  }, [account.desc, account.extendedItems, account.name]);
+    setName(defaultAccount?.name ?? '');
+    setDesc(defaultAccount?.desc ?? '');
+    setExtendedItems(defaultAccount?.extendedItems ?? []);
+  }, [defaultAccount?.desc, defaultAccount?.extendedItems, defaultAccount?.name]);
 
   const [oneTimeToggle, setOnetimeToggle] = useState<boolean>();
 
@@ -206,7 +198,7 @@ const AccountForm = forwardRef<any, FormProps>(({ account, isEditing = true }, r
         </View>
       ) : (
         <View>
-          <Text style={GlobalStyles.description}>{account?.desc}</Text>
+          <Text style={GlobalStyles.description}>{defaultAccount?.desc}</Text>
         </View>
       )}
       {extendedItems.map((_e) => {
@@ -237,15 +229,12 @@ export const AddAccount: FC<NativeStackScreenProps<RootStackParamList, 'AddAccou
   navigation,
   route,
 }) => {
+  const { createNewAccount } = useAccountCurd();
   const { dbConn } = useContext(globalContext);
-  const { accountId: groupId } = route.params;
-  const [item, setItem] = useState<EAccount>();
+  const { groupId } = route.params;
   const formRef = useRef<{ getValues: () => EAccount }>();
 
-  const createNewAccount = useCallback(() => {
-    if (!dbConn) {
-      return;
-    }
+  const create = useCallback(async () => {
     const values = formRef.current?.getValues();
     if (!values) {
       return;
@@ -254,50 +243,26 @@ export const AddAccount: FC<NativeStackScreenProps<RootStackParamList, 'AddAccou
       Alert.alert('a name is required');
       return;
     }
-    dbConn.manager
-      .findOne(EGroup, {
-        where: { groupId },
-        relations: { accountList: true },
-      })
-      .then((group) => {
-        if (!group) {
-          return;
-        }
-        const newAccount = dbConn.manager.create(EAccount, {
-          ...item,
-          ...values,
-          accountId: nanoid(),
-        });
-        newAccount.extendedItems = values.extendedItems.map((i) => {
-          return dbConn.manager.create(EExtendItem, {
-            extendItemId: i.extendItemId,
-            name: i.name,
-            content: i.content,
-          });
-        }) as EExtendItem[];
-        group.accountList.push(newAccount);
-        dbConn.manager
-          .save(group)
-          .then((_res) => {
-            navigation.goBack();
-          })
-          .catch((err) => {
-            console.log('🚀 ~ file: CreateTag.tsx:48 ~ addTag ~ err:', err);
-          });
-      });
-  }, [dbConn, groupId, item, navigation]);
+    await createNewAccount(groupId, values);
+    navigation.goBack();
 
-  useEffect(() => {
-    setItem(createBlankAccount());
-    navigation.setOptions({
-      title: `Add an item to group: ${name}`,
-    });
-  }, [navigation]);
+    if (!dbConn) {
+      return;
+    }
+  }, [createNewAccount, dbConn, groupId, navigation]);
+
   return (
-    <View style={styles.container}>
-      {item && <AccountForm account={item} ref={formRef} />}
-      <PrimaryButton pressHandler={createNewAccount} name="Save" />
-    </View>
+    <SafeWithHeaderKeyboardAvoidingView>
+      <View style={[styles.container]}>
+        <AccountForm isEditing={true} ref={formRef} />
+        {/* buttons on the bottom */}
+        <View style={styles.operations}>
+          <View style={styles.addExtentdButtonContainer}>
+            <PrimaryButton pressHandler={create} name="Save" />
+          </View>
+        </View>
+      </View>
+    </SafeWithHeaderKeyboardAvoidingView>
   );
 };
 
@@ -313,16 +278,18 @@ export const AccountDetail: FC<NativeStackScreenProps<RootStackParamList, 'Accou
     setIsEditing(true);
   }, []);
 
-  const { account, createNewAccount, deleteAccount, refresh, setAccount, updateAccount } =
-    useAccountCurd(accountId);
+  const { account, deleteAccount, updateAccount, refresh } = useAccountCurd(accountId);
 
   const update = useCallback(async () => {
     const values = formRef.current?.getValues();
     if (!values) {
       return;
     }
-    await updateAccount(values);
-  }, [updateAccount]);
+    const res = await updateAccount(values);
+    await refresh();
+    console.log('🚀 ~ update ~ res:', res);
+    setIsEditing(false);
+  }, [refresh, updateAccount]);
 
   const deleteSelf = useCallback(async () => {
     await deleteAccount();
@@ -343,7 +310,7 @@ export const AccountDetail: FC<NativeStackScreenProps<RootStackParamList, 'Accou
   return (
     <SafeWithHeaderKeyboardAvoidingView>
       <View style={[styles.container, GlobalStyles.debug]}>
-        {account && <AccountForm account={account} isEditing={isEditing} ref={formRef} />}
+        <AccountForm defaultAccount={account} isEditing={isEditing} ref={formRef} />
         {/* buttons on the bottom */}
         <View style={styles.operations}>
           <View style={styles.addExtentdButtonContainer}>

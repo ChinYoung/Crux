@@ -7,26 +7,28 @@ import { EGroup } from '../entities/EGroup';
 import { nanoid } from 'nanoid';
 
 export const useAccountCurd = (accountId?: EAccount['accountId']) => {
+  const [localAccountId, setLocalAccountId] = useState<EAccount['accountId']>();
+
   const [account, setAccount] = useState<EAccount>();
 
   const { dbConn } = useContext(globalContext);
   const refresh = useCallback(async () => {
-    if (!accountId) {
+    if (!localAccountId) {
       return;
     }
     const res = await dbConn?.manager.findOne(EAccount, {
-      where: { accountId },
+      where: { accountId: localAccountId },
       relations: { extendedItems: true },
     });
     if (!res) {
       return;
     }
     setAccount(res);
-  }, [accountId, dbConn?.manager]);
+  }, [localAccountId, dbConn?.manager]);
 
   const updateAccount = useCallback(
     (updatedValue: EAccount) => {
-      if (!accountId) {
+      if (!localAccountId) {
         return;
       }
       if (!dbConn?.manager) {
@@ -37,7 +39,8 @@ export const useAccountCurd = (accountId?: EAccount['accountId']) => {
       }
       const newAccount = dbConn.manager.create(EAccount, {
         ...updatedValue,
-        accountId,
+        accountId: localAccountId,
+        id: account?.id,
       });
       newAccount.extendedItems = updatedValue.extendedItems.map((i) => {
         if (i.id) {
@@ -52,22 +55,22 @@ export const useAccountCurd = (accountId?: EAccount['accountId']) => {
       }) as EExtendItem[];
       return dbConn.manager.save<EAccount>(newAccount);
     },
-    [dbConn?.manager, accountId],
+    [account?.id, dbConn?.manager, localAccountId],
   );
 
   const deleteAccount = useCallback(async () => {
-    if (!accountId) {
+    if (!localAccountId) {
       return;
     }
     const targetAccount = await dbConn?.manager.findOne(EAccount, {
-      where: { accountId },
+      where: { accountId: localAccountId },
       relations: { extendedItems: true },
     });
     if (!targetAccount) {
       return;
     }
     await dbConn?.manager.remove(targetAccount);
-  }, [accountId, dbConn?.manager]);
+  }, [localAccountId, dbConn?.manager]);
 
   const createNewAccount = useCallback(
     async (groupId: EGroup['groupId'], newAccountData: EAccount) => {
@@ -109,9 +112,14 @@ export const useAccountCurd = (accountId?: EAccount['accountId']) => {
     refresh();
   }, [refresh]);
 
+  useEffect(() => {
+    setLocalAccountId(accountId);
+  }, [accountId]);
+
   return {
     account,
     setAccount,
+    setLocalAccountId,
     refresh,
     updateAccount,
     deleteAccount,
