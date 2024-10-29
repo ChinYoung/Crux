@@ -19,9 +19,7 @@ import { SafeWithHeaderKeyboardAvoidingView } from '../components/SafeWithHeader
 import Animated, {
   runOnJS,
   useAnimatedStyle,
-  useFrameCallback,
   useSharedValue,
-  withDelay,
   withTiming,
 } from 'react-native-reanimated';
 import { PrimaryButton } from '../components/Button';
@@ -30,7 +28,6 @@ import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faFilter } from '@fortawesome/free-solid-svg-icons';
 import { LIGHT_DEFAULT_COLOR } from '../theme/color';
 import { GlobalStyles } from '../global/styles';
-import { RnImagePicker } from '../components/ImagePicker';
 
 const EXPAND_WIDTH = 160;
 const CLAPSED_WIDTH = 40;
@@ -95,7 +92,6 @@ export const Home: FC<NativeStackScreenProps<RootStackParamList, 'Home'>> = ({ n
   return (
     <SafeWithHeaderKeyboardAvoidingView>
       <View style={[styles.root, GlobalStyles.debug]}>
-        <RnImagePicker />
         {/* content */}
         <Pressable onPress={Keyboard.dismiss} style={[styles.container]}>
           <View style={styles.contentWrapper}>

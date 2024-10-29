@@ -1,11 +1,21 @@
 import 'react-native-get-random-values';
 import { nanoid } from 'nanoid';
-import { createRef, FC, forwardRef, Ref, RefObject, useCallback, useEffect, useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, TextInput, View } from 'react-native';
+import { createRef, forwardRef, RefObject, useCallback, useEffect, useState } from 'react';
+import {
+  Image,
+  LayoutChangeEvent,
+  Pressable,
+  StyleSheet,
+  TextInput,
+  useWindowDimensions,
+  View,
+} from 'react-native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faTrash } from '@fortawesome/free-solid-svg-icons';
 import { confirmHof } from '../utils/hof';
 import { GlobalStyles } from '../global/styles';
+import { RnImagePicker } from './RnImagePicker';
+import { ImagePickerAsset } from 'expo-image-picker';
 
 export type CustomField = {
   extendItemId: string;
@@ -90,6 +100,10 @@ export const FieldEditor = forwardRef<
     const labelInput = createRef<TextInput>();
     const contentInput = createRef<TextInput>();
 
+    const [image, setImage] = useState<ImagePickerAsset>();
+    const [imageWidth, setImageWidth] = useState<number>();
+    const [imageHeight, setImageHeight] = useState<number>();
+
     const onInputLabel = useCallback(
       (text: string) => {
         updateLabel(itemId, text);
@@ -106,10 +120,29 @@ export const FieldEditor = forwardRef<
       deleteField(itemId);
     }, [deleteField, itemId]);
 
+    const onSelectImage = useCallback((selectedImage: ImagePickerAsset) => {
+      setImage(selectedImage);
+    }, []);
+
     useEffect(() => {
       labelInput.current?.focus();
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
+
+    const onImageIsReady = useCallback((layoutEvent: LayoutChangeEvent) => {
+      const { width } = layoutEvent.nativeEvent.layout;
+      setImageWidth(parseInt(width.toString(), 10));
+    }, []);
+
+    useEffect(() => {
+      if (!imageWidth) {
+        return;
+      }
+      if (!image) {
+        return;
+      }
+      setImageHeight((image.height * imageWidth) / image.width);
+    }, [image, imageWidth]);
 
     return (
       <View style={[styles.root]} ref={containerRef}>
@@ -137,6 +170,16 @@ export const FieldEditor = forwardRef<
             onChangeText={onInputContent}
             autoCapitalize="none"
           />
+        </View>
+        <RnImagePicker onSelectImage={onSelectImage} />
+        <View style={[GlobalStyles.debug]}>
+          {image && (
+            <Image
+              source={{ uri: image.uri }}
+              style={{ width: '100%', height: imageHeight }}
+              onLayout={onImageIsReady}
+            />
+          )}
         </View>
       </View>
     );
