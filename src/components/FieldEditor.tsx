@@ -16,6 +16,7 @@ import { confirmHof } from '../utils/hof';
 import { GlobalStyles } from '../global/styles';
 import { RnImagePicker } from './RnImagePicker';
 import { ImagePickerAsset } from 'expo-image-picker';
+import * as FileSystem from 'expo-file-system';
 
 export type CustomField = {
   extendItemId: string;
@@ -101,6 +102,7 @@ export const FieldEditor = forwardRef<
     const contentInput = createRef<TextInput>();
 
     const [image, setImage] = useState<ImagePickerAsset>();
+    const [imageUri, setImageUri] = useState<string>();
     const [imageWidth, setImageWidth] = useState<number>();
     const [imageHeight, setImageHeight] = useState<number>();
 
@@ -120,9 +122,28 @@ export const FieldEditor = forwardRef<
       deleteField(itemId);
     }, [deleteField, itemId]);
 
-    const onSelectImage = useCallback((selectedImage: ImagePickerAsset) => {
-      setImage(selectedImage);
+    const saveImage = useCallback((source: string, target: string) => {
+      if (!FileSystem.documentDirectory) {
+        return;
+      }
+      FileSystem.copyAsync({
+        from: source,
+        to: target,
+      });
     }, []);
+
+    const onSelectImage = useCallback(
+      async (selectedImage: ImagePickerAsset) => {
+        console.log('🚀 ~ onSelectImage ~ selectedImage:', selectedImage);
+        const targetPath = `${FileSystem.documentDirectory}${selectedImage.fileName}`;
+        // setImage(selectedImage);
+        console.log('🚀 ~ targetPath:', targetPath);
+        await saveImage(selectedImage.uri, targetPath);
+        setImageUri(targetPath);
+        setImage(selectedImage);
+      },
+      [saveImage],
+    );
 
     useEffect(() => {
       labelInput.current?.focus();
@@ -173,9 +194,9 @@ export const FieldEditor = forwardRef<
         </View>
         <RnImagePicker onSelectImage={onSelectImage} />
         <View style={[GlobalStyles.debug]}>
-          {image && (
+          {imageUri && (
             <Image
-              source={{ uri: image.uri }}
+              source={{ uri: imageUri }}
               style={{ width: '100%', height: imageHeight }}
               onLayout={onImageIsReady}
             />
