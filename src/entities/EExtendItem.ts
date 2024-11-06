@@ -9,6 +9,11 @@ import {
 import { ColumnType } from '../types/DataSourceTypes';
 import { EAccount } from './EAccount';
 
+enum ExtendItemType {
+  text = 'text',
+  image = 'image',
+}
+
 @Entity()
 export class EExtendItem {
   @PrimaryGeneratedColumn()
@@ -28,6 +33,9 @@ export class EExtendItem {
 
   @Column(ColumnType.text)
   content: string;
+
+  @Column(ColumnType.text, { default: ExtendItemType.text })
+  type?: ExtendItemType;
 
   @ManyToOne(() => EAccount, (item) => item.extendedItems, {
     onDelete: 'CASCADE',

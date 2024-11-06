@@ -11,7 +11,7 @@ import {
   useState,
 } from 'react';
 import { RootStackParamList } from '../route/Router';
-import { Pressable, ScrollView, Text, TextInput, View } from 'react-native';
+import { Button, Modal, Pressable, ScrollView, Text, TextInput, View } from 'react-native';
 import { globalContext } from '../context/globalContext';
 import { StyleSheet } from 'react-native';
 import { EExtendItem } from '../entities/EExtendItem';
@@ -109,6 +109,8 @@ const AccountForm = forwardRef<any, FormProps>(({ defaultAccount, isEditing = tr
   const [desc, setDesc] = useState<string>('');
   const [extendedItems, setExtendedItems] = useState<EExtendItem[]>([]);
 
+  const [showAddModal, setShowAddModal] = useState<boolean>(false);
+
   const containerRef = createRef<ScrollView>();
   const nameInputRef = createRef<TextInput>();
 
@@ -159,6 +161,8 @@ const AccountForm = forwardRef<any, FormProps>(({ defaultAccount, isEditing = tr
     containerRef.current?.scrollToEnd({ animated: true });
   }, [containerRef, extendedItems]);
 
+  const showAddFieldModal = useCallback(() => {}, []);
+
   useEffect(() => {
     setName(defaultAccount?.name ?? '');
     setDesc(defaultAccount?.desc ?? '');
@@ -180,48 +184,79 @@ const AccountForm = forwardRef<any, FormProps>(({ defaultAccount, isEditing = tr
   }, [containerRef, isEditing, nameInputRef, oneTimeToggle]);
 
   return (
-    <ScrollView
-      ref={containerRef}
-      contentContainerStyle={styles.contentContainer}
-      keyboardShouldPersistTaps="always"
-    >
-      {isEditing ? (
-        <View>
-          <Text>Name</Text>
-          <CustomInput multiple={false} onChange={setName} value={name} ref={nameInputRef} />
-        </View>
-      ) : null}
-      {isEditing ? (
-        <View>
-          <Text>Dscription</Text>
-          <CustomInput multiple={true} onChange={setDesc} value={desc} />
-        </View>
-      ) : (
-        <View>
-          <Text style={GlobalStyles.description}>{defaultAccount?.desc}</Text>
-        </View>
-      )}
-      {extendedItems.map((_e) => {
-        return isEditing ? (
-          <FieldEditor
-            key={_e.extendItemId}
-            extendItemId={_e.extendItemId}
-            name={_e.name}
-            content={_e.content}
-            updateContent={updateField}
-            updateLabel={updateLabel}
-            deleteField={deleteField}
-          />
+    <>
+      <Modal visible={showAddModal} transparent={true} animationType="fade">
+        <Pressable
+          style={{
+            flex: 1,
+            justifyContent: 'center',
+            alignItems: 'center',
+            paddingVertical: 20,
+          }}
+          onPress={() => setShowAddModal(false)}
+        >
+          <View
+            style={{
+              borderRadius: 8,
+              paddingVertical: 16,
+              paddingHorizontal: 32,
+              backgroundColor: 'white',
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}
+          >
+            <Pressable style={{ backgroundColor: '#fff' }}>
+              <Text>text</Text>
+            </Pressable>
+            <Pressable style={{ backgroundColor: '#fff' }}>
+              <Text>image</Text>
+            </Pressable>
+          </View>
+        </Pressable>
+      </Modal>
+      <ScrollView
+        ref={containerRef}
+        contentContainerStyle={styles.contentContainer}
+        keyboardShouldPersistTaps="always"
+      >
+        {isEditing ? (
+          <View>
+            <Text>Name</Text>
+            <CustomInput multiple={false} onChange={setName} value={name} ref={nameInputRef} />
+          </View>
+        ) : null}
+        {isEditing ? (
+          <View>
+            <Text>Dscription</Text>
+            <CustomInput multiple={true} onChange={setDesc} value={desc} />
+          </View>
         ) : (
-          <LocalKeyValue key={_e.extendItemId} keyName={_e.name} value={_e.content} />
-        );
-      })}
-      {isEditing && (
-        <View>
-          <AddFieldButton onClick={addNewField} />
-        </View>
-      )}
-    </ScrollView>
+          <View>
+            <Text style={GlobalStyles.description}>{defaultAccount?.desc}</Text>
+          </View>
+        )}
+        {extendedItems.map((_e) => {
+          return isEditing ? (
+            <FieldEditor
+              key={_e.extendItemId}
+              extendItemId={_e.extendItemId}
+              name={_e.name}
+              content={_e.content}
+              updateContent={updateField}
+              updateLabel={updateLabel}
+              deleteField={deleteField}
+            />
+          ) : (
+            <LocalKeyValue key={_e.extendItemId} keyName={_e.name} value={_e.content} />
+          );
+        })}
+        {isEditing && (
+          <View>
+            <AddFieldButton onClick={() => setShowAddModal(true)} />
+          </View>
+        )}
+      </ScrollView>
+    </>
   );
 });
 
