@@ -11,24 +11,24 @@ import {
   useState,
 } from 'react';
 import { RootStackParamList } from '../route/Router';
-import { Button, Modal, Pressable, ScrollView, Text, TextInput, View } from 'react-native';
+import { Keyboard, Modal, Pressable, ScrollView, Text, TextInput, View } from 'react-native';
 import { globalContext } from '../context/globalContext';
 import { StyleSheet } from 'react-native';
-import { EExtendItem } from '../entities/EExtendItem';
+import { EExtendItem, ExtendItemType } from '../entities/EExtendItem';
 import { EAccount } from '../entities/EAccount';
-import { PrimaryButton } from '../components/Button';
+import { ErrorButton, PrimaryButton, SecondaryButton } from '../components/Button';
 import { Alert } from 'react-native';
 import { createExtendField, FieldEditor } from '../components/FieldEditor';
 import { AddFieldButton } from '../components/AddFieldButton';
 import { CustomInput } from '../components/CustomInput';
-import { EGroup } from '../entities/EGroup';
-import { nanoid } from 'nanoid';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faTrash } from '@fortawesome/free-solid-svg-icons';
 import { confirmHof } from '../utils/hof';
 import { GlobalStyles } from '../global/styles';
 import { SafeWithHeaderKeyboardAvoidingView } from '../components/SafeWithHeaderKeyboardAvoidingView';
 import { useAccountCurd } from '../hooks/useAccount';
+import { Gap } from '../components/Gap';
+import { useClickOutside } from 'react-native-click-outside';
 
 type FormProps = { defaultAccount?: EAccount; isEditing?: boolean };
 
@@ -114,6 +114,8 @@ const AccountForm = forwardRef<any, FormProps>(({ defaultAccount, isEditing = tr
   const containerRef = createRef<ScrollView>();
   const nameInputRef = createRef<TextInput>();
 
+  const clickRef = useClickOutside<View>(() => setShowAddModal(false));
+
   useImperativeHandle(ref, () => {
     return {
       getValues() {
@@ -155,13 +157,27 @@ const AccountForm = forwardRef<any, FormProps>(({ defaultAccount, isEditing = tr
     [extendedItems],
   );
 
-  const addNewField = useCallback(() => {
-    const { newExtendItem } = createExtendField();
+  const addNewTextField = useCallback(() => {
+    const { newExtendItem } = createExtendField(ExtendItemType.text);
     setExtendedItems([...extendedItems, newExtendItem] as EExtendItem[]);
     containerRef.current?.scrollToEnd({ animated: true });
   }, [containerRef, extendedItems]);
 
-  const showAddFieldModal = useCallback(() => {}, []);
+  const addNewImageField = useCallback(() => {
+    const { newExtendItem } = createExtendField(ExtendItemType.image);
+    setExtendedItems([...extendedItems, newExtendItem] as EExtendItem[]);
+    containerRef.current?.scrollToEnd({ animated: true });
+  }, [containerRef, extendedItems]);
+
+  const addText = useCallback(() => {
+    addNewTextField();
+    setShowAddModal(false);
+  }, [addNewTextField]);
+
+  const addImage = useCallback(() => {
+    addNewImageField();
+    setShowAddModal(false);
+  }, [addNewImageField]);
 
   useEffect(() => {
     setName(defaultAccount?.name ?? '');
@@ -185,32 +201,33 @@ const AccountForm = forwardRef<any, FormProps>(({ defaultAccount, isEditing = tr
 
   return (
     <>
-      <Modal visible={showAddModal} transparent={true} animationType="fade">
+      <Modal visible={showAddModal} transparent={true} animationType="none">
         <Pressable
           style={{
             flex: 1,
             justifyContent: 'center',
             alignItems: 'center',
             paddingVertical: 20,
+            backgroundColor: 'rgba(0,0,0,0.5)',
           }}
-          onPress={() => setShowAddModal(false)}
         >
           <View
             style={{
               borderRadius: 8,
-              paddingVertical: 16,
+              paddingVertical: 32,
               paddingHorizontal: 32,
-              backgroundColor: 'white',
+              gap: 8,
+              backgroundColor: '#F5EFFF',
               justifyContent: 'center',
               alignItems: 'center',
+              width: 320,
             }}
+            ref={clickRef}
           >
-            <Pressable style={{ backgroundColor: '#fff' }}>
-              <Text>text</Text>
-            </Pressable>
-            <Pressable style={{ backgroundColor: '#fff' }}>
-              <Text>image</Text>
-            </Pressable>
+            <SecondaryButton pressHandler={addText} name="text" />
+            <SecondaryButton pressHandler={addImage} name="image" />
+            <Gap />
+            <ErrorButton pressHandler={() => setShowAddModal(false)} name="cancel" />
           </View>
         </Pressable>
       </Modal>
@@ -238,6 +255,7 @@ const AccountForm = forwardRef<any, FormProps>(({ defaultAccount, isEditing = tr
         {extendedItems.map((_e) => {
           return isEditing ? (
             <FieldEditor
+              type={_e.type}
               key={_e.extendItemId}
               extendItemId={_e.extendItemId}
               name={_e.name}
@@ -252,7 +270,16 @@ const AccountForm = forwardRef<any, FormProps>(({ defaultAccount, isEditing = tr
         })}
         {isEditing && (
           <View>
-            <AddFieldButton onClick={() => setShowAddModal(true)} />
+            <AddFieldButton
+              onClick={() => {
+                if (Keyboard.isVisible()) {
+                  Keyboard.dismiss();
+                }
+                setTimeout(() => {
+                  setShowAddModal(true);
+                }, 100);
+              }}
+            />
           </View>
         )}
       </ScrollView>

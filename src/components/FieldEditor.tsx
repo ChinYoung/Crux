@@ -1,15 +1,7 @@
 import 'react-native-get-random-values';
 import { nanoid } from 'nanoid';
 import { createRef, forwardRef, RefObject, useCallback, useEffect, useState } from 'react';
-import {
-  Image,
-  LayoutChangeEvent,
-  Pressable,
-  StyleSheet,
-  TextInput,
-  useWindowDimensions,
-  View,
-} from 'react-native';
+import { Image, LayoutChangeEvent, Pressable, StyleSheet, TextInput, View } from 'react-native';
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
 import { faTrash } from '@fortawesome/free-solid-svg-icons';
 import { confirmHof } from '../utils/hof';
@@ -17,8 +9,10 @@ import { GlobalStyles } from '../global/styles';
 import { RnImagePicker } from './RnImagePicker';
 import { ImagePickerAsset } from 'expo-image-picker';
 import * as FileSystem from 'expo-file-system';
+import { ExtendItemType } from '../entities/EExtendItem';
 
 export type CustomField = {
+  type: ExtendItemType;
   extendItemId: string;
   name: string;
   content: string;
@@ -26,7 +20,7 @@ export type CustomField = {
   contentError?: string;
 };
 
-export function createExtendField() {
+export function createExtendField(type: ExtendItemType) {
   const newFieldId = nanoid();
   return {
     newFieldId,
@@ -36,6 +30,7 @@ export function createExtendField() {
       content: '',
       labelError: '',
       contentError: '',
+      type,
     } as CustomField,
   };
 }

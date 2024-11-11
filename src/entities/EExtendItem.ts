@@ -9,7 +9,7 @@ import {
 import { ColumnType } from '../types/DataSourceTypes';
 import { EAccount } from './EAccount';
 
-enum ExtendItemType {
+export enum ExtendItemType {
   text = 'text',
   image = 'image',
 }
@@ -35,7 +35,7 @@ export class EExtendItem {
   content: string;
 
   @Column(ColumnType.text, { default: ExtendItemType.text })
-  type?: ExtendItemType;
+  type: ExtendItemType;
 
   @ManyToOne(() => EAccount, (item) => item.extendedItems, {
     onDelete: 'CASCADE',
