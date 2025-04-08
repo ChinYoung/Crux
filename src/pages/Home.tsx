@@ -1,13 +1,8 @@
-import React, { FC, useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import React, { FC, useCallback, useContext, useEffect,  useState } from 'react';
 import {
-  Button,
   Keyboard,
-  KeyboardAvoidingView,
   Pressable,
-  SafeAreaView,
   StyleSheet,
-  Text,
-  TextInput,
   View,
 } from 'react-native';
 import { globalContext } from '../context/globalContext';

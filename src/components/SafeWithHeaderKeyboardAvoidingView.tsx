@@ -1,6 +1,6 @@
 import { useHeaderHeight } from '@react-navigation/elements';
 import { FC, PropsWithChildren } from 'react';
-import { KeyboardAvoidingView, SafeAreaView, StyleSheet } from 'react-native';
+import { KeyboardAvoidingView,  StyleSheet, View } from 'react-native';
 
 const styles = StyleSheet.create({
   root: {
@@ -13,10 +13,10 @@ export const SafeWithHeaderKeyboardAvoidingView: FC<PropsWithChildren> = ({ chil
   console.log(headerHeight, '============');
 
   return (
-    <SafeAreaView style={[styles.root]}>
+    <View style={[styles.root]}>
       <KeyboardAvoidingView style={styles.root} behavior="padding">
         {children}
       </KeyboardAvoidingView>
-    </SafeAreaView>
+    </View>
   );
 };
